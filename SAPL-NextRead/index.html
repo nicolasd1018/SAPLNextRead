@@ -1,13 +1,30 @@
 <!doctype html>
+
 <html>
   <head>
-    <meta charset="UTF-8" />
-    <title>Hello World!</title>
+    <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline';">
+
+    <title>SAPL NEXT READ!</title>
 
   </head>
   <body>
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your Electron application.</p>
+    <div id="header" style="display: flex; justify-content: left; border-bottom: 5px solid #602983; width: 100vw;">
+        <div id="name-and-logo" style="display: flex;">
+            <img id="logo" src="/logo.png"  />
+            <div id="name-and-tagline" style="display: flex; align-items: center; flex-direction: column;">
+                <div id="name" style="
+                    font-family: Inter, sans-serif;
+                    font-weight: bold;
+                    font-size: 70px;
+                    ">
+                    NextRead
+                </div>
+                <div id="tagline" style="font-size: 28px;">
+                    Find your next favorite
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="module" src="/src/renderer.ts"></script>
   </body>
 </html>

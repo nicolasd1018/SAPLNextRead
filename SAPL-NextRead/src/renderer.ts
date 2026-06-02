@@ -27,7 +27,11 @@
  */
 
 import './index.css';
+import './Pages/MainPage'
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
 );
+
+const mainPage = document.createElement('main-page');
+document.body.appendChild(mainPage);
