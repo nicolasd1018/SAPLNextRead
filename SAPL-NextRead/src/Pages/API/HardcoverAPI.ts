@@ -15,25 +15,45 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+interface response {
+    books: {user_books: {user: {user_books: {book: book}[]}}[]}[]
+}
 
+interface book {
+    image: {url: string }
+    title: string
+}
 // const client = ...
-export const test = () => {
-    client
+export const getRecommendations = async (title: string): Promise<book[]>=> {
+    var reccomendation: book[] =  [];
+    await client
     .query({
         query: gql`
+        fragment cover on books
+        {
+        image {
+                            url
+                }
+        }
+
+        fragment information on books{
+        title
+            contributions{author{name}}
+        description
+        }
+
         query MyQuery {
-            books (where: {_and: [{title: {_eq: "Watership Down"}}, {users_read_count: {_gt: 0}}]})
+            books (where: {_and: [{title: {_eq: "${title}"}}, {users_read_count: {_gt: 0}}]})
             {
-                user_books (where: {rating: {_gte: 4}}){
+                user_books (where: {rating: {_gte: 4}}
+                            limit: 100){
                 user{
-                    user_books (where: {rating: {_gte: 4}}){
+                    user_books (where: {rating: {_gte: 4}}
+                                order_by: {rating: desc}
+                                limit: 5){
                     book{
-                        title
-                        contributions{author{name}}
-                        # description
-                        image {
-                        url
-                        }
+                        ...cover
+                        ...information
                     }
                     }
                 }
@@ -42,6 +62,10 @@ export const test = () => {
     }
     `,
         errorPolicy: 'all'
+    }).then((result) => { 
+        console.log((result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat()[0])
+        
+        reccomendation = (result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat().map((b)=> b.book)
     })
-    .then((result) => console.log(result));
+    return reccomendation
 }
