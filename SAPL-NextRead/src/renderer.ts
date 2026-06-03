@@ -27,11 +27,13 @@
  */
 
 import './index.css';
+import {test} from './Pages/API/HardcoverAPI';
 import './Pages/MainPage'
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
 );
 
+test()
 const mainPage = document.createElement('main-page');
 document.body.appendChild(mainPage);
