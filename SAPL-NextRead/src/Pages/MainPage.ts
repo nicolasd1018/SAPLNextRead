@@ -11,14 +11,14 @@ export class MainPage extends HTMLElement {
     if (this.shadowRoot) {
         this.shadowRoot.innerHTML = templateString;
         const searchBar = this.shadowRoot.getElementById("search-bar");
-        const carousel = this.shadowRoot.getElementById("book-carousel");
+        const bookSpace = this.shadowRoot.getElementById("book-space");
         if (searchBar && searchBar instanceof HTMLInputElement) {
             searchBar.addEventListener("keydown", async function(event){
                 if (event.key === "Enter") {
                     event.preventDefault()
                     var books = await getRecommendations(searchBar.value)
-                    books.slice(0,2).forEach((book)=>{
-                        carousel!.innerHTML += `<img src=${book.image.url}>`
+                    books.slice(0,4).forEach((book)=>{
+                        bookSpace!.innerHTML += `<img src=${book.image.url} style="width: 11vw; height: calc(11vw * 1.5)">`
                     })
                 }
             });
