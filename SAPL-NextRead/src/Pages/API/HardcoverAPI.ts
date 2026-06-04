@@ -48,10 +48,11 @@ export const getRecommendations = async (title: string): Promise<book[]>=> {
                 user_books (where: {rating: {_gte: 4}}
                             limit: 100){
                 user{
-                    user_books (where: {rating: {_gte: 4}}
+                    user_books (where:{_and: [{rating: {_gte: 4}}, {book: {title: {_neq: "${title}"}}}]}
                                 order_by: {rating: desc}
+      
                                 limit: 5){
-                    book{
+                    book {
                         ...cover
                         ...information
                     }
