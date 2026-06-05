@@ -66,7 +66,7 @@ export const getRecommendations = async (title: string): Promise<book[]>=> {
     }).then((result) => { 
         console.log((result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat()[0])
         
-        reccomendation = (result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat().map((b)=> b.book)
+        reccomendation = [...new Set((result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat().map((b)=> b.book))]
     })
     return reccomendation
 }

@@ -5,28 +5,21 @@
     align-items: center;
     border-bottom: 5px solid #602983;
     ">
-        <div id="search-bar-label"
-        style="
-        font-size: 24px;
-        font-weight: bold;
-        padding-left: 10px;
-        padding-right: 10px;
-        ">Search By</div>
-        <input id="search-bar" type="text" style="height: 29px; font-size: 20px;"/>
+        <nextread-searchbar style="display: flex;"></nextread-searchbar>
     </div>
     <div id="book-carousel" 
          style="display: flex;
          position: absolute;
          width: 100vw;
          justify-content: space-between;
-         top: calc(50% - 457px/2 + 62.5px);
+         top: calc(50% - 275px/2 + 62.5px);
          align-items: center;
          ">
          <img id="left-arrow" src="/Arrow.png" style="
         width: 149px;
         height: 121px;
         left: -18px;"/>
-        <div id="book-space" style="display: flex;"></div>
+        <div id="book-space" style="display: flex; align-items: center;"></div>
         <img id="right-arrow" src="/Arrow.png" style="transform: scaleX(-1); width: 149px;
         height: 121px; right: -18px;"/>
     </div>
