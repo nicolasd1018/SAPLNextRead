@@ -19,7 +19,7 @@ interface response {
     books: {user_books: {user: {user_books: {book: book}[]}}[]}[]
 }
 
-interface book {
+export interface book {
     image: {url: string }
     title: string
 }
