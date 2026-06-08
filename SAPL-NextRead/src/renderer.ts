@@ -28,10 +28,27 @@
 
 import './index.css';
 import './Pages/MainPage'
+import './Pages/BookPage'
+import { book } from './API/HardcoverAPI';
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
 );
 
 const mainPage = document.createElement('main-page');
+const bookPage = document.createElement('book-page');
+
+export const changePage = (book: book | undefined) => {
+  if (book) {
+    document.body.removeChild(mainPage);
+
+    bookPage.setAttribute('imgUrl', book.image.url);
+    bookPage.setAttribute('title', book.title)
+    bookPage.setAttribute('subtitle', book.subtitle)
+
+    document.body.append(bookPage);
+  }
+}
+
 document.body.appendChild(mainPage);
+// document.body.appendChild(bookPage);

@@ -22,6 +22,9 @@ interface response {
 export interface book {
     image: {url: string }
     title: string
+    contributions: {Author: {name:string}}[]
+    description: string
+    subtitle: string
 }
 // const client = ...
 export const getRecommendations = async (title: string): Promise<book[]>=> {

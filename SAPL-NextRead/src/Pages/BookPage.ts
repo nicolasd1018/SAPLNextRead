@@ -1,0 +1,37 @@
+import templateString from '../Pages/BookPage.template.html?raw';
+
+class BookPage extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+    }
+
+    static get observedAttributes() {
+    return ["title", "author", "description", "imgUrl", "subtitle"];
+  }
+
+
+    connectedCallback() {
+        if (this.shadowRoot) {
+            this.shadowRoot.innerHTML = templateString;
+            const imgUrl = this.getAttribute('imgUrl');
+            const bookCover = this.shadowRoot.getElementById('book-cover');
+            const title = this.getAttribute('title');
+            const bookTitle = this.shadowRoot.getElementById('title');
+
+            if (imgUrl && bookCover && bookCover instanceof HTMLImageElement){
+                bookCover.src = imgUrl;
+            }
+
+            if (title && bookTitle && bookTitle instanceof HTMLElement){
+                bookTitle.innerHTML = title;
+            }
+        }
+    }
+}
+
+if (!customElements.get('book-page')) {
+    customElements.define('book-page',BookPage );
+}
+
+export default BookPage;
