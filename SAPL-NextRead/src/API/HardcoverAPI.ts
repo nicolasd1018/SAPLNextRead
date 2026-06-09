@@ -22,7 +22,7 @@ interface response {
 export interface book {
     image: {url: string }
     title: string
-    contributions: {Author: {name:string}}[]
+    contributions: {author: {name:string}}[]
     description: string
     subtitle: string
 }
@@ -41,6 +41,7 @@ export const getRecommendations = async (title: string): Promise<book[]>=> {
 
         fragment information on books{
         title
+        subtitle
             contributions{author{name}}
         description
         }

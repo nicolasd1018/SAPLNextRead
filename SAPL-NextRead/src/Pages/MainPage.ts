@@ -63,6 +63,22 @@ export class MainPage extends HTMLElement {
             rightArrow.addEventListener("click", async  (event) => {
                 x += 1;
                 this.fillBookCarousel(books, bookSpace!, x);
+                if (bookSpace && bookSpace instanceof HTMLElement)
+                    {
+                        bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
+                        if (bookCovers) {
+                            console.log(bookCovers)
+                            bookCovers.forEach((bc)=> {
+                                const bookIndex = Number(bc.getAttribute('data-book-index'));
+                                if (bookIndex >= 0){
+                                    bc.addEventListener("click", async (event) => {
+                                        console.log(books)
+                                        changePage(books[bookIndex])
+                                    })
+                                }
+                            })
+                        }
+                    }
             })
         }
 
@@ -71,7 +87,22 @@ export class MainPage extends HTMLElement {
                 if (x > -1) {
                     x -= 1;
                     this.fillBookCarousel(books, bookSpace!, x);
-                    console.log('test')
+                    if (bookSpace && bookSpace instanceof HTMLElement)
+                    {
+                        bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
+                        if (bookCovers) {
+                            console.log(bookCovers)
+                            bookCovers.forEach((bc)=> {
+                                const bookIndex = Number(bc.getAttribute('data-book-index'));
+                                if (bookIndex >= 0){
+                                    bc.addEventListener("click", async (event) => {
+                                        console.log(books)
+                                        changePage(books[bookIndex])
+                                    })
+                                }
+                            })
+                        }
+                    }
                 }
             })
         }

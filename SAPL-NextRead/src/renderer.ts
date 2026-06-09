@@ -38,17 +38,29 @@ console.log(
 const mainPage = document.createElement('main-page');
 const bookPage = document.createElement('book-page');
 
-export const changePage = (book: book | undefined) => {
+export const changePage = (book: book | undefined = undefined) => {
   if (book) {
     document.body.removeChild(mainPage);
-
+    console.log(book)
     bookPage.setAttribute('imgUrl', book.image.url);
-    bookPage.setAttribute('title', book.title)
-    bookPage.setAttribute('subtitle', book.subtitle)
+    bookPage.setAttribute('title', book.title);
+    bookPage.setAttribute('subtitle', book.subtitle);
+    bookPage.setAttribute('author', book.contributions[0].author.name);
+    bookPage.setAttribute('description', book.description)
 
     document.body.append(bookPage);
   }
+  else {
+    document.body.removeChild(bookPage);
+    document.body.append(mainPage)
+  }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const header = document.getElementById("header");
+    if (header)
+      header.addEventListener("click", async()=>{changePage()} );
+});
 
 document.body.appendChild(mainPage);
 // document.body.appendChild(bookPage);
