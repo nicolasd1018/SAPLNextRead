@@ -48,7 +48,6 @@ export class MainPage extends HTMLElement {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (bookIndex >= 0){
                                     bc.addEventListener("click", async (event) => {
-                                        console.log(books)
                                         changePage(books[bookIndex])
                                     })
                                 }
@@ -72,7 +71,6 @@ export class MainPage extends HTMLElement {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (bookIndex >= 0){
                                     bc.addEventListener("click", async (event) => {
-                                        console.log(books)
                                         changePage(books[bookIndex])
                                     })
                                 }
