@@ -12,7 +12,7 @@ url = f'https://mysapl.bibliocommons.com/v2/search?searchType=keyword&query=${da
 response = requests.get(url)
 page = BeautifulSoup(response.text, 'html.parser')
 
-results = page.find('ul', class_='results')
-
-print(len(results))
+results = page.find('ul', class_='results').find_all('span', class_= 'title-content')
+results[0].get_text()
+print(any(element.get_text() == data[0].replace('%20', " ") for element in results))
 sys.stdout.flush()

@@ -3,6 +3,7 @@ import { book, getRecommendations } from '../API/HardcoverAPI';
 import '../components/Searchbar.js'; // Just the path, no variable name!
 import Searchbar from '../components/Searchbar.js';
 import { changePage } from '../renderer';
+import checkCatalogue from '../services/CheckCatalogue';
 
 
 
@@ -38,6 +39,7 @@ export class MainPage extends HTMLElement {
                     event.preventDefault();
                     x = -1;
                     books = await getRecommendations(searchBar.value);
+                    books.forEach((book) => console.log(book.title, checkCatalogue(book.title)))
                     this.fillBookCarousel(books, bookSpace!, x);
                     if (bookSpace && bookSpace instanceof HTMLElement)
                     {

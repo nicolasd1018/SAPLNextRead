@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
-import { PythonShell } from 'python-shell';
+import checkCatalogue from './services/CheckCatalogue';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -9,20 +9,7 @@ if (started) {
 }
 
  
-let pyshell = new PythonShell('Web_Scraper/web_scaper.py');
 
-pyshell.send(JSON.stringify(['Watership%20Down']))
- 
-pyshell.on('message', function(message) {
-  console.log(message);
-})
- 
-pyshell.end(function (err) {
-  if (err){
-    throw err;
-  };
-  console.log('finished');
-});
 
 
 
@@ -37,7 +24,7 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-
+  
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
