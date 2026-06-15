@@ -39,13 +39,13 @@ export class MainPage extends HTMLElement {
                     event.preventDefault();
                     x = -1;
                     books = await getRecommendations(searchBar.value);
-                    books.forEach((book) => console.log(book.title, checkCatalogue(book.title)))
+                    const result = await window.electronAPI.runPythonScript(books.map((book)=> book.title.replaceAll(" ", "%20")));
+                    console.log(result)
                     this.fillBookCarousel(books, bookSpace!, x);
                     if (bookSpace && bookSpace instanceof HTMLElement)
                     {
                         bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
                         if (bookCovers) {
-                            console.log(bookCovers)
                             bookCovers.forEach((bc)=> {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (bookIndex >= 0){
@@ -68,7 +68,6 @@ export class MainPage extends HTMLElement {
                     {
                         bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
                         if (bookCovers) {
-                            console.log(bookCovers)
                             bookCovers.forEach((bc)=> {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (bookIndex >= 0){
@@ -91,7 +90,6 @@ export class MainPage extends HTMLElement {
                     {
                         bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
                         if (bookCovers) {
-                            console.log(bookCovers)
                             bookCovers.forEach((bc)=> {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (bookIndex >= 0){

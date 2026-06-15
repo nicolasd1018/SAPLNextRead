@@ -1,7 +1,8 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Options } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import checkCatalogue from './services/CheckCatalogue';
+import { PythonShell } from 'python-shell';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -24,7 +25,7 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-  
+
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
@@ -37,6 +38,22 @@ const createWindow = () => {
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
 };
+
+ipcMain.handle('run-python', async (event, text) => {
+    let options: Options = {
+        mode: 'text',
+        args: text // Your string is passed as a command line argument
+    };
+
+    return new Promise((resolve, reject) => {
+        PythonShell.run('Web_Scraper/web_scaper.py', options).then(messages => {
+            resolve(messages); // Returns array of printed outputs from Python
+        }).catch(err => {
+            reject(err);
+        });
+    });
+});
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
