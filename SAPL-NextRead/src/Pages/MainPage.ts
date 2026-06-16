@@ -39,8 +39,10 @@ export class MainPage extends HTMLElement {
                     event.preventDefault();
                     x = -1;
                     books = await getRecommendations(searchBar.value);
-                    const result = await window.electronAPI.runPythonScript(books.map((book)=> book.title.replaceAll(" ", "%20")));
-                    console.log(result)
+                    books.forEach(async (book)=> {
+                        const result = await window.electronAPI.runPythonScript(book.title.replaceAll(' ', '%20'));
+                        console.log(result)
+                    })
                     this.fillBookCarousel(books, bookSpace!, x);
                     if (bookSpace && bookSpace instanceof HTMLElement)
                     {

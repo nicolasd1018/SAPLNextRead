@@ -42,7 +42,7 @@ const createWindow = () => {
 ipcMain.handle('run-python', async (event, text) => {
     let options: Options = {
         mode: 'text',
-        args: text // Your string is passed as a command line argument
+        args: [text] // Your string is passed as a command line argument
     };
 
     return new Promise((resolve, reject) => {
