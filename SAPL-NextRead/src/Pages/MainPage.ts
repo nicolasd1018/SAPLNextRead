@@ -39,10 +39,15 @@ export class MainPage extends HTMLElement {
                     event.preventDefault();
                     x = -1;
                     books = await getRecommendations(searchBar.value);
-                    books.forEach(async (book)=> {
-                        const result = await window.electronAPI.runPythonScript(book.title.replaceAll(' ', '%20'));
-                        console.log(result)
-                    })
+                    const asyncResults = await Promise.all(
+                        books.map(async (book, index) => {
+                            const result = await window.electronAPI.runPythonScript(book.title.replaceAll(' ', '%20'));
+                            console.log(book.title, result[0]);
+                            return {index: index, present: result[0] === 'True'};
+                        })
+                    );
+                    books = books.filter((book, index)=> asyncResults.find((r)=> r.index===index)?.present);
+                    console.log(books);
                     this.fillBookCarousel(books, bookSpace!, x);
                     if (bookSpace && bookSpace instanceof HTMLElement)
                     {

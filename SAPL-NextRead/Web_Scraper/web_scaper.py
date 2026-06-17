@@ -26,7 +26,6 @@ response: requests.Response
 try:
     response = session.get(url)
     response.raise_for_status()  # Raise an exception for HTTP errors
-    print(response.content)  # Handle the response
 except requests.exceptions.ConnectionError as e:
     print(f"Error connecting to the server: {e}")
 except requests.exceptions.HTTPError as e:
@@ -40,7 +39,7 @@ results = page.find('ul', class_='results')
 if results != None:
     results = results.find_all('span', class_= 'title-content')
     results[0].get_text()
-    print((data.replace('%20', " "),(any(element.get_text() == data.replace('%20', " ") for element in results))))
+    print(any(element.get_text() == data.replace('%20', " ") for element in results))
 else:
-    print((data.replace('%20', " "),(False)))
+    print(False)
 sys.stdout.flush()
