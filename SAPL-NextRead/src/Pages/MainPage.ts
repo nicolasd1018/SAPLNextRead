@@ -32,6 +32,7 @@ export class MainPage extends HTMLElement {
         let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');; 
         let x = -1;
         var books: book[];
+        let iteration = 0;
 
         if (searchBar && searchBar instanceof HTMLInputElement) {
             searchBar.addEventListener("keydown", async (event) => {
@@ -69,7 +70,22 @@ export class MainPage extends HTMLElement {
 
         if (rightArrow && rightArrow instanceof HTMLImageElement) {
             rightArrow.addEventListener("click", async  (event) => {
+                
                 x += 1;
+                if (x >= books.length -3){
+                    iteration += 1;
+                    let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value, iteration);
+                    const asyncResults = await Promise.all(
+                        newBooks.map(async (book, index) => {
+                            const result = await window.electronAPI.runPythonScript(book.title.replaceAll(' ', '%20'));
+                            console.log(book.title, result[0]);
+                            return {index: index, present: result[0] === 'True'};
+                        })
+                    );
+                    newBooks = newBooks.filter((book, index)=> asyncResults.find((r)=> r.index===index)?.present);
+                    books = [...books, ...newBooks];
+                    console.log(books);
+                }
                 this.fillBookCarousel(books, bookSpace!, x);
                 if (bookSpace && bookSpace instanceof HTMLElement)
                     {
@@ -77,8 +93,9 @@ export class MainPage extends HTMLElement {
                         if (bookCovers) {
                             bookCovers.forEach((bc)=> {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
-                                if (bookIndex >= 0){
+                                if (x >= 0){
                                     bc.addEventListener("click", async (event) => {
+                                        
                                         changePage(books[bookIndex])
                                     })
                                 }
@@ -92,6 +109,7 @@ export class MainPage extends HTMLElement {
             leftArrow.addEventListener("click", async  (event) => {
                 if (x > -1) {
                     x -= 1;
+                    
                     this.fillBookCarousel(books, bookSpace!, x);
                     if (bookSpace && bookSpace instanceof HTMLElement)
                     {

@@ -27,7 +27,7 @@ export interface book {
     subtitle: string
 }
 // const client = ...
-export const getRecommendations = async (title: string): Promise<book[]>=> {
+export const getRecommendations = async (title: string, iteration?: number): Promise<book[]>=> {
     var reccomendation: book[] =  [];
     await client
     .query({
@@ -50,12 +50,12 @@ export const getRecommendations = async (title: string): Promise<book[]>=> {
             books (where: {_and: [{title: {_eq: "${title}"}}, {users_read_count: {_gt: 0}}]})
             {
                 user_books (where: {rating: {_gte: 4}}
-                            limit: 100){
+                            ${iteration ? `offset: ${10* iteration}` : ''} limit: 10){
                 user{
                     user_books (where:{_and: [{rating: {_gte: 4}}, {book: {title: {_neq: "${title}"}}}]}
                                 order_by: {rating: desc}
       
-                                limit: 5){
+                                 limit: 5){
                     book {
                         ...cover
                         ...information
