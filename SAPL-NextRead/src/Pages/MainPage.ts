@@ -2,6 +2,7 @@ import templateString from '../Pages/MainPage.template.html?raw';
 import { book, getRecommendations } from '../API/HardcoverAPI';
 import '../components/Searchbar.js'; 
 import { changePage } from '../renderer';
+import checkCatalogue from '../services/CheckCatalogue';
 
 
 
@@ -21,6 +22,16 @@ export class MainPage extends HTMLElement {
                     bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+2}" class="book-cover" src=${books[x+2].image.url} style="width: 15vw; height: calc(15vw * 1.5); padding-left: 10vw;">`
     }
 
+    async availabilityCheck(books: book[]){
+        const asyncResults = await Promise.all(
+                        this.#books.map(async (book, index) => {
+                            const result = await window.electronAPI.runPythonScript(book.title.replaceAll('%', '%25').replaceAll(' ', '%20'));
+                            return {index: index, present: result[0] === 'True'};
+                        })
+                    );
+        return books.filter((book, index)=> asyncResults.find((r)=> r.index===index)?.present)
+    }
+
    connectedCallback() {
     if (this.shadowRoot) {
         this.shadowRoot.innerHTML = templateString;
@@ -37,17 +48,13 @@ export class MainPage extends HTMLElement {
                 if (event.key === "Enter") {
                     event.preventDefault();
                     x = -1;
+                    // get book recommendations from Hardcover
                     this.#books = await getRecommendations(searchBar.value);
+                    // filter out all the duplicates
                     this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
-                    const asyncResults = await Promise.all(
-                        this.#books.map(async (book, index) => {
-                            const result = await window.electronAPI.runPythonScript(book.title.replaceAll('%', '%25').replaceAll(' ', '%20'));
-                            console.log(book.title, result[0]);
-                            return {index: index, present: result[0] === 'True'};
-                        })
-                    );
-                    this.#books = this.#books.filter((book, index)=> asyncResults.find((r)=> r.index===index)?.present);
-                    console.log(this.#books);
+
+                    // check to see if books are available in SAPL catalogue and filter out the ones that aren't
+                    this.#books = await this.availabilityCheck(this.#books);
                     this.fillBookCarousel(this.#books, bookSpace!, x);
                     if (bookSpace && bookSpace instanceof HTMLElement)
                     {
@@ -75,17 +82,9 @@ export class MainPage extends HTMLElement {
                     iteration += 1;
                     let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value, iteration);
                     newBooks = [...new Set(newBooks.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
-                    const asyncResults = await Promise.all(
-                        newBooks.map(async (book, index) => {
-                            const result = await window.electronAPI.runPythonScript(book.title.replaceAll('%', '%25').replaceAll(' ', '%20'));
-                            console.log(book.title, result[0]);
-                            return {index: index, present: result[0] === 'True'};
-                        })
-                    );
-                    newBooks = newBooks.filter((book, index)=> asyncResults.find((r)=> r.index===index)?.present);
+                    newBooks = await this.availabilityCheck(newBooks);
                     this.#books = [...this.#books, ...newBooks];
                     this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
-                    console.log(this.#books);
                 }
                 this.fillBookCarousel(this.#books, bookSpace!, x);
                 if (bookSpace && bookSpace instanceof HTMLElement)
@@ -119,7 +118,6 @@ export class MainPage extends HTMLElement {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (bookIndex >= 0){
                                     bc.addEventListener("click", async (event) => {
-                                        console.log(this.#books)
                                         changePage(this.#books[bookIndex])
                                     })
                                 }

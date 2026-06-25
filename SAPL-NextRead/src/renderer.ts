@@ -29,6 +29,7 @@
 import './index.css';
 import './Pages/MainPage'
 import './Pages/BookPage'
+import './components/Header'
 import { book } from './API/HardcoverAPI';
 
 console.log(
@@ -37,6 +38,7 @@ console.log(
 
 const mainPage = document.createElement('main-page');
 const bookPage = document.createElement('book-page');
+const header = document.createElement('nextread-header');
 
 export const changePage = (book: book | undefined = undefined) => {
   if (book) {
@@ -56,10 +58,6 @@ export const changePage = (book: book | undefined = undefined) => {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const header = document.getElementById("header");
-    if (header)
-      header.addEventListener("click", async()=>{changePage()} );
-});
 
+document.body.appendChild(header);
 document.body.appendChild(mainPage);

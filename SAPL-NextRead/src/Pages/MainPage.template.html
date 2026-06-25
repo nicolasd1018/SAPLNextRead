@@ -1,26 +1,48 @@
-<div id="SNR-main-container" aria-label="mainPageContainer" style="display: flex; flex-direction: column;">
-    <div id="search-row" style="
-    display: flex;
-    height: 45px;
-    align-items: center;
-    border-bottom: 5px solid #602983;
-    ">
-        <nextread-searchbar style="display: flex;"></nextread-searchbar>
-    </div>
-    <div id="book-carousel" 
-         style="display: flex;
-         position: absolute;
-         width: 100vw;
-         justify-content: space-between;
-         top: 30%;
-         align-items: center;
-         ">
-         <img id="left-arrow" src="/Arrow.png" style="
+<style>
+    #SNR-main-container{
+        display: flex;
+        flex-direction: column;
+    }
+    #search-rows{
+        display: flex;
+        height: 45px;
+        align-items: center;
+        border-bottom: 5px solid #602983;
+    }
+    nextread-searchbar{
+        display: flex;
+    }
+    #book-carousel{
+        display: flex;
+        position: absolute;
+        width: 100vw;
+        justify-content: space-between;
+        top: 30%;
+        align-items: center;
+    }
+    #left-arrow{
         width: 149px;
         height: 121px;
-        left: -18px;"/>
-        <div id="book-space" style="display: flex; align-items: center; height: calc(23vw*1.5);"></div>
-        <img id="right-arrow" src="/Arrow.png" style="transform: scaleX(-1); width: 149px;
-        height: 121px; right: -18px;"/>
+        left: -18px;
+    }
+    #book-space{
+        display: flex; 
+        align-items: center; 
+        height: calc(23vw*1.5);
+    }
+    #right-arrow{
+        transform: scaleX(-1); 
+        width: 149px;
+        height: 121px; right: -18px;
+    }
+</style>
+<div id="SNR-main-container" aria-label="mainPageContainer">
+    <div id="search-rows" >
+        <nextread-searchbar></nextread-searchbar>
+    </div>
+    <div id="book-carousel" >
+         <img id="left-arrow" src="/Arrow.png" />
+        <div id="book-space"></div>
+        <img id="right-arrow" src="/Arrow.png" />
     </div>
 </div>
