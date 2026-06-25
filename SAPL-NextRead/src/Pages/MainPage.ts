@@ -1,18 +1,17 @@
 import templateString from '../Pages/MainPage.template.html?raw';
 import { book, getRecommendations } from '../API/HardcoverAPI';
-import '../components/Searchbar.js'; // Just the path, no variable name!
-import Searchbar from '../components/Searchbar.js';
+import '../components/Searchbar.js'; 
 import { changePage } from '../renderer';
-import checkCatalogue from '../services/CheckCatalogue';
 
 
 
 
 export class MainPage extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-  }
+    #books: book[] = []
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+    }
 
     fillBookCarousel(books: book[], bookSpace: HTMLElement, x: number) {
         bookSpace!.innerHTML = ''
@@ -31,7 +30,6 @@ export class MainPage extends HTMLElement {
         const leftArrow = this.shadowRoot.getElementById("left-arrow")
         let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');; 
         let x = -1;
-        var books: book[];
         let iteration = 0;
 
         if (searchBar && searchBar instanceof HTMLInputElement) {
@@ -39,17 +37,18 @@ export class MainPage extends HTMLElement {
                 if (event.key === "Enter") {
                     event.preventDefault();
                     x = -1;
-                    books = await getRecommendations(searchBar.value);
+                    this.#books = await getRecommendations(searchBar.value);
+                    this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     const asyncResults = await Promise.all(
-                        books.map(async (book, index) => {
-                            const result = await window.electronAPI.runPythonScript(book.title.replaceAll(' ', '%20'));
+                        this.#books.map(async (book, index) => {
+                            const result = await window.electronAPI.runPythonScript(book.title.replaceAll('%', '%25').replaceAll(' ', '%20'));
                             console.log(book.title, result[0]);
                             return {index: index, present: result[0] === 'True'};
                         })
                     );
-                    books = books.filter((book, index)=> asyncResults.find((r)=> r.index===index)?.present);
-                    console.log(books);
-                    this.fillBookCarousel(books, bookSpace!, x);
+                    this.#books = this.#books.filter((book, index)=> asyncResults.find((r)=> r.index===index)?.present);
+                    console.log(this.#books);
+                    this.fillBookCarousel(this.#books, bookSpace!, x);
                     if (bookSpace && bookSpace instanceof HTMLElement)
                     {
                         bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
@@ -58,7 +57,7 @@ export class MainPage extends HTMLElement {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (bookIndex >= 0){
                                     bc.addEventListener("click", async (event) => {
-                                        changePage(books[bookIndex])
+                                        changePage(this.#books[bookIndex])
                                     })
                                 }
                             })
@@ -72,21 +71,23 @@ export class MainPage extends HTMLElement {
             rightArrow.addEventListener("click", async  (event) => {
                 
                 x += 1;
-                if (x >= books.length -3){
+                if (x >= this.#books.length -3){
                     iteration += 1;
                     let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value, iteration);
+                    newBooks = [...new Set(newBooks.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     const asyncResults = await Promise.all(
                         newBooks.map(async (book, index) => {
-                            const result = await window.electronAPI.runPythonScript(book.title.replaceAll(' ', '%20'));
+                            const result = await window.electronAPI.runPythonScript(book.title.replaceAll('%', '%25').replaceAll(' ', '%20'));
                             console.log(book.title, result[0]);
                             return {index: index, present: result[0] === 'True'};
                         })
                     );
                     newBooks = newBooks.filter((book, index)=> asyncResults.find((r)=> r.index===index)?.present);
-                    books = [...books, ...newBooks];
-                    console.log(books);
+                    this.#books = [...this.#books, ...newBooks];
+                    this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
+                    console.log(this.#books);
                 }
-                this.fillBookCarousel(books, bookSpace!, x);
+                this.fillBookCarousel(this.#books, bookSpace!, x);
                 if (bookSpace && bookSpace instanceof HTMLElement)
                     {
                         bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
@@ -95,8 +96,7 @@ export class MainPage extends HTMLElement {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (x >= 0){
                                     bc.addEventListener("click", async (event) => {
-                                        
-                                        changePage(books[bookIndex])
+                                        changePage(this.#books[bookIndex])
                                     })
                                 }
                             })
@@ -110,7 +110,7 @@ export class MainPage extends HTMLElement {
                 if (x > -1) {
                     x -= 1;
                     
-                    this.fillBookCarousel(books, bookSpace!, x);
+                    this.fillBookCarousel(this.#books, bookSpace!, x);
                     if (bookSpace && bookSpace instanceof HTMLElement)
                     {
                         bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
@@ -119,8 +119,8 @@ export class MainPage extends HTMLElement {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (bookIndex >= 0){
                                     bc.addEventListener("click", async (event) => {
-                                        console.log(books)
-                                        changePage(books[bookIndex])
+                                        console.log(this.#books)
+                                        changePage(this.#books[bookIndex])
                                     })
                                 }
                             })

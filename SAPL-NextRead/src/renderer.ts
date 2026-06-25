@@ -40,8 +40,8 @@ const bookPage = document.createElement('book-page');
 
 export const changePage = (book: book | undefined = undefined) => {
   if (book) {
-    document.body.removeChild(mainPage);
-    console.log(book)
+    mainPage.style.display = 'none';
+    console.log(book);
     bookPage.setAttribute('imgUrl', book.image.url);
     bookPage.setAttribute('title', book.title);
     bookPage.setAttribute('subtitle', book.subtitle);
@@ -52,7 +52,7 @@ export const changePage = (book: book | undefined = undefined) => {
   }
   else {
     document.body.removeChild(bookPage);
-    document.body.append(mainPage)
+    mainPage.style.display = 'block';
   }
 }
 
@@ -63,4 +63,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.body.appendChild(mainPage);
-// document.body.appendChild(bookPage);
