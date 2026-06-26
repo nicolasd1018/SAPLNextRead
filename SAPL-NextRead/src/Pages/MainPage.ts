@@ -1,5 +1,5 @@
 import templateString from '../Pages/MainPage.template.html?raw';
-import { book, getRecommendations } from '../API/HardcoverAPI';
+import { book, getGenres, getRecommendations } from '../API/HardcoverAPI';
 import '../components/Searchbar.js'; 
 import { changePage } from '../renderer';
 import checkCatalogue from '../services/CheckCatalogue';
@@ -42,6 +42,7 @@ export class MainPage extends HTMLElement {
         let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');; 
         let x = -1;
         let iteration = 0;
+        
 
         if (searchBar && searchBar instanceof HTMLInputElement) {
             searchBar.addEventListener("keydown", async (event) => {

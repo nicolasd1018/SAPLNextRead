@@ -49,6 +49,7 @@ export const changePage = (book: book | undefined = undefined) => {
     bookPage.setAttribute('subtitle', book.subtitle);
     bookPage.setAttribute('author', book.contributions[0].author.name);
     bookPage.setAttribute('description', book.description)
+    bookPage.setAttribute('id', String(book.id))
 
     document.body.append(bookPage);
   }

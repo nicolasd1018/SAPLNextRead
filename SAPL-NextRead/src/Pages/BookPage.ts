@@ -1,3 +1,4 @@
+import { getGenres } from '../API/HardcoverAPI';
 import templateString from '../Pages/BookPage.template.html?raw';
 
 class BookPage extends HTMLElement {
@@ -7,11 +8,11 @@ class BookPage extends HTMLElement {
     }
 
     static get observedAttributes() {
-    return ["title", "author", "description", "imgUrl", "subtitle"];
+    return ["title", "author", "description", "imgUrl", "subtitle", 'id'];
   }
 
 
-    connectedCallback() {
+    async connectedCallback() {
         if (this.shadowRoot) {
             this.shadowRoot.innerHTML = templateString;
             const imgUrl = this.getAttribute('imgUrl');
@@ -21,7 +22,8 @@ class BookPage extends HTMLElement {
             const author = this.getAttribute('author');
             const authorText = this.shadowRoot.getElementById('author');
             const description = this.getAttribute('description');
-            const descriptionText = this.shadowRoot.getElementById('description')
+            const descriptionText = this.shadowRoot.getElementById('description');
+            const id = this.getAttribute('id');
 
             if (imgUrl && bookCover && bookCover instanceof HTMLImageElement){
                 bookCover.src = imgUrl;
@@ -37,6 +39,11 @@ class BookPage extends HTMLElement {
 
             if (description && descriptionText && descriptionText instanceof HTMLElement){
                 descriptionText.innerHTML = description;
+            }
+
+            if (id){
+                const genres = await getGenres(Number(id));
+                console.log(genres)
             }
         }
     }

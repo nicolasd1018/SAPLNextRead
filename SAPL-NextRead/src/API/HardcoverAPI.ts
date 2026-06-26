@@ -20,11 +20,13 @@ interface response {
 }
 
 export interface book {
+    id: number
     image: {url: string }
     title: string
     contributions: {author: {name:string}}[]
     description: string
     subtitle: string
+    genres: {tag: {tagName: string}}[]
 }
 // const client = ...
 export const getRecommendations = async (title: string, iteration?: number): Promise<book[]>=> {
@@ -40,9 +42,10 @@ export const getRecommendations = async (title: string, iteration?: number): Pro
         }
 
         fragment information on books{
+        id
         title
         subtitle
-            contributions{author{name}}
+        contributions{author{name}}
         description
         }
 
@@ -68,9 +71,27 @@ export const getRecommendations = async (title: string, iteration?: number): Pro
     `,
         errorPolicy: 'all'
     }).then((result) => { 
-        console.log((result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat()[0])
-        
-        reccomendation = [...new Set((result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat().map((b)=> b.book))]
+        reccomendation = [...new Set((result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat().map((b)=> b.book))];
     })
     return reccomendation
 }
+
+export const getGenres = async ( bookID: number) => {
+    let genres: string[] = [];
+    await client
+    .query({
+        query: gql`
+        {
+        books(where: {id: {_eq: ${bookID}}}){
+            taggable_counts(where: {tag: {tag_category_id: {_eq: 1}}}order_by: {count: desc_nulls_last} limit: 5){
+            tag{
+                tag
+            }
+            }
+        }
+        }`
+    }).then((result) => {
+        genres = [...(result.data as {books: {taggable_counts: {tag: {tag: string}}[]}[]}).books[0].taggable_counts.map((taggable_counts)=>taggable_counts.tag.tag)].sort();
+    });
+    return genres;
+} 
