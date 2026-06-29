@@ -24,6 +24,7 @@ class BookPage extends HTMLElement {
             const description = this.getAttribute('description');
             const descriptionText = this.shadowRoot.getElementById('description');
             const id = this.getAttribute('id');
+            const genreSpace = this.shadowRoot.getElementById('genre-space');
 
             if (imgUrl && bookCover && bookCover instanceof HTMLImageElement){
                 bookCover.src = imgUrl;
@@ -43,7 +44,13 @@ class BookPage extends HTMLElement {
 
             if (id){
                 const genres = await getGenres(Number(id));
-                console.log(genres)
+                genres.forEach((genre, index) => {
+                    const genreTag = document.createElement('div');
+                    genreTag.id = `genre-tag-${index}`;
+                    genreTag.className = 'tag';
+                    genreTag.innerText = genre;
+                    genreSpace?.appendChild(genreTag);
+                })
             }
         }
     }
