@@ -17,22 +17,52 @@
     .tag{
         color: white;
         background-color: #602983;
+        display: block;
+        width: fit-content;
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 5px;
     }
-    .genre-label{
+    #genre-label{
         font-size: 20px; 
         font-family: Merriweather;
+        
+    }
+    #warning-label{
+        font-size: 20px; 
+        font-family: Merriweather;
+        
     }
     #title{
         font-size: 24px; 
         font-family: Merriweather;
     }
+    #genre-space{
+        display: flex;
+        width: 306px;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-top: 10px;
+    }
+    #warning-space{
+        display: flex;
+        width: 306px;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-top: 10px;
+    }
+    .tag-space{
+        padding-top: 15px;
+        padding-left: 25px;
+        padding-right: 25px;
+        display: flex;
+        flex-direction: row;
+        gap: 30px;
+    }
 </style>
 <div id="book-page-container">
     <div id='book-cover-and-tags'>
         <img id="book-cover" style="width: 21vw; height: calc(21vw*1.5)" />
-        <div id="genre-label">Genres</div>
-        <div id="genre-space">
-        </div>
     </div>
     <div id="book-header">
         <div id="title"></div>
@@ -40,3 +70,16 @@
         <div id="description" style="font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; font-size: 16pxs;"></div>
     </div>
 </div>
+<div class="tag-space">   
+    <div>
+        <div id="genre-label">Genres</div>
+        <div id="genre-space">
+    </div>
+    </div>
+    <div>
+        <div id="warning-label">Content Warnings</div>
+        <div id="warning-space">
+        </div>
+    </div>
+</div>
+ 

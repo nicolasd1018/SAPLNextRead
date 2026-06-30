@@ -95,3 +95,23 @@ export const getGenres = async ( bookID: number) => {
     });
     return genres;
 } 
+
+export const getContentWarnings = async ( bookID: number) => {
+    let contentWarnings: string[] = [];
+    await client
+    .query({
+        query: gql`
+        {
+        books(where: {id: {_eq: ${bookID}}}){
+            taggable_counts(where: {tag: {tag_category_id: {_eq: 3}}}order_by: {count: desc_nulls_last}){
+            tag{
+                tag
+            }
+            }
+        }
+        }`
+    }).then((result) => {
+        contentWarnings = [...(result.data as {books: {taggable_counts: {tag: {tag: string}}[]}[]}).books[0].taggable_counts.map((taggable_counts)=>taggable_counts.tag.tag)].sort();
+    });
+    return contentWarnings;
+} 
