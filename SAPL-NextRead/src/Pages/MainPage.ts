@@ -51,8 +51,8 @@ export class MainPage extends HTMLElement {
                     event.preventDefault();
                     x = -1;
                     // get book recommendations from Hardcover
-                    this.#books = await getRecommendations(searchBar.value);
                     loadingScreen!.style.display = 'flex';
+                    this.#books = await getRecommendations(searchBar.value);
                     // filter out all the duplicates
                     this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
 
@@ -84,6 +84,7 @@ export class MainPage extends HTMLElement {
                 x += 1;
                 if (x >= this.#books.length -3){
                     iteration += 1;
+                    loadingScreen!.style.display = 'flex';
                     let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value, iteration);
                     newBooks = [...new Set(newBooks.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     newBooks = await this.availabilityCheck(newBooks);
@@ -91,6 +92,7 @@ export class MainPage extends HTMLElement {
                     this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                 }
                 this.fillBookCarousel(this.#books, bookSpace!, x);
+                loadingScreen!.style.display = 'none';
                 if (bookSpace && bookSpace instanceof HTMLElement)
                     {
                         bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
