@@ -115,3 +115,23 @@ export const getContentWarnings = async ( bookID: number) => {
     });
     return contentWarnings;
 } 
+
+export const getMoods = async ( bookID: number) => {
+    let moods: string[] = [];
+    await client
+    .query({
+        query: gql`
+        {
+        books(where: {id: {_eq: ${bookID}}}){
+            taggable_counts(where: {tag: {tag_category_id: {_eq: 4}}}order_by: {count: desc_nulls_last} limit: 5){
+            tag{
+                tag
+            }
+            }
+        }
+        }`
+    }).then((result) => {
+        moods = [...(result.data as {books: {taggable_counts: {tag: {tag: string}}[]}[]}).books[0].taggable_counts.map((taggable_counts)=>taggable_counts.tag.tag)].sort();
+    });
+    return moods;
+} 

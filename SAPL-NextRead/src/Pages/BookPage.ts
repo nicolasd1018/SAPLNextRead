@@ -1,4 +1,4 @@
-import { getContentWarnings, getGenres } from '../API/HardcoverAPI';
+import { getContentWarnings, getGenres, getMoods } from '../API/HardcoverAPI';
 import templateString from '../Pages/BookPage.template.html?raw';
 
 class BookPage extends HTMLElement {
@@ -26,6 +26,7 @@ class BookPage extends HTMLElement {
             const id = this.getAttribute('id');
             const genreSpace = this.shadowRoot.getElementById('genre-space');
             const warningSpace = this.shadowRoot.getElementById('warning-space');
+            const moodSpace = this.shadowRoot.getElementById('mood-space');
 
             if (imgUrl && bookCover && bookCover instanceof HTMLImageElement){
                 bookCover.src = imgUrl;
@@ -55,11 +56,19 @@ class BookPage extends HTMLElement {
                 const contentWarnings = await getContentWarnings(Number(id));
                 contentWarnings.forEach((warning, index)=>{
                     const warningTag = document.createElement('div');
-                    warningTag.id = `genre-tag-${index}`;
+                    warningTag.id = `warning-tag-${index}`;
                     warningTag.className = 'tag';
                     warningTag.innerText = warning;
                     warningSpace?.appendChild(warningTag);
-                })
+                });
+                const moods = await getMoods(Number(id));
+                moods.forEach((mood, index)=>{
+                    const moodTag = document.createElement('div');
+                    moodTag.id = `mood-tag-${index}`;
+                    moodTag.className = 'tag';
+                    moodTag.innerText = mood;
+                    moodSpace?.appendChild(moodTag);
+                });
             }
         }
     }

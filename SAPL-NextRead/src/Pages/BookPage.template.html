@@ -23,12 +23,7 @@
         padding-right: 15px;
         padding-bottom: 5px;
     }
-    #genre-label{
-        font-size: 20px; 
-        font-family: Merriweather;
-        
-    }
-    #warning-label{
+    .label{
         font-size: 20px; 
         font-family: Merriweather;
         
@@ -37,16 +32,9 @@
         font-size: 24px; 
         font-family: Merriweather;
     }
-    #genre-space{
+    .tag-holder{
         display: flex;
-        width: 306px;
-        flex-wrap: wrap;
-        gap: 10px;
-        padding-top: 10px;
-    }
-    #warning-space{
-        display: flex;
-        width: 306px;
+        max-width: 306px;
         flex-wrap: wrap;
         gap: 10px;
         padding-top: 10px;
@@ -57,7 +45,8 @@
         padding-right: 25px;
         display: flex;
         flex-direction: row;
-        gap: 30px;
+        /* gap: 10px; */
+        justify-content: space-between;
     }
 </style>
 <div id="book-page-container">
@@ -72,14 +61,18 @@
 </div>
 <div class="tag-space">   
     <div>
-        <div id="genre-label">Genres</div>
-        <div id="genre-space">
+        <div class="label" id="genre-label">Genres</div>
+        <div class="tag-holder" id="genre-space">
     </div>
     </div>
     <div>
-        <div id="warning-label">Content Warnings</div>
-        <div id="warning-space">
+        <div class="label" id="warning-label">Content Warnings</div>
+        <div class="tag-holder" id="warning-space">
         </div>
+    </div>
+    <div>
+        <div class="label" id="mood-label">Moods</div>
+        <div class="tag-holder" id="mood-space"></div>
     </div>
 </div>
  

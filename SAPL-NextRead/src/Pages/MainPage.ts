@@ -1,8 +1,8 @@
 import templateString from '../Pages/MainPage.template.html?raw';
-import { book, getGenres, getRecommendations } from '../API/HardcoverAPI';
+import { book, getRecommendations } from '../API/HardcoverAPI';
 import '../components/Searchbar.js'; 
 import { changePage } from '../renderer';
-import checkCatalogue from '../services/CheckCatalogue';
+import '../components/LoadingScreen';
 
 
 
@@ -37,9 +37,10 @@ export class MainPage extends HTMLElement {
         this.shadowRoot.innerHTML = templateString;
         const searchBar = this.shadowRoot.querySelector("nextread-searchbar")?.shadowRoot?.getElementById("search-bar");
         const bookSpace = this.shadowRoot.getElementById("book-space");
-        const rightArrow = this.shadowRoot.getElementById("right-arrow")
-        const leftArrow = this.shadowRoot.getElementById("left-arrow")
-        let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');; 
+        const rightArrow = this.shadowRoot.getElementById("right-arrow");
+        const leftArrow = this.shadowRoot.getElementById("left-arrow");
+        const loadingScreen = this.shadowRoot.getElementById('loading-screen');
+        let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');;
         let x = -1;
         let iteration = 0;
         
@@ -51,11 +52,13 @@ export class MainPage extends HTMLElement {
                     x = -1;
                     // get book recommendations from Hardcover
                     this.#books = await getRecommendations(searchBar.value);
+                    loadingScreen!.style.display = 'flex';
                     // filter out all the duplicates
                     this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
 
                     // check to see if books are available in SAPL catalogue and filter out the ones that aren't
                     this.#books = await this.availabilityCheck(this.#books);
+                    loadingScreen!.style.display = 'none';
                     this.fillBookCarousel(this.#books, bookSpace!, x);
                     if (bookSpace && bookSpace instanceof HTMLElement)
                     {
