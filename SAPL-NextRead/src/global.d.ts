@@ -3,7 +3,8 @@ export {};
 declare global {
   interface Window {
     electronAPI: {
-      runPythonScript: (text: string) => Promise<string[]>;
+      runWebScraper: (text: string) => Promise<string[]>;
+      runAgeFinder: (text: string) => Promise<string[]>;
     };
   }
 }

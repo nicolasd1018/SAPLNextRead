@@ -25,7 +25,7 @@ export class MainPage extends HTMLElement {
     async availabilityCheck(books: book[]){
         const asyncResults = await Promise.all(
                         this.#books.map(async (book, index) => {
-                            const result = await window.electronAPI.runPythonScript(book.title.replaceAll('%', '%25').replaceAll(' ', '%20'));
+                            const result = await window.electronAPI.runWebScraper(book.title.replaceAll('%', '%25').replaceAll(' ', '%20'));
                             return {index: index, present: result[0] === 'True'};
                         })
                     );

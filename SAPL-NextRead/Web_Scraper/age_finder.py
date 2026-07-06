@@ -3,6 +3,10 @@ import requests
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+
 
 
 
@@ -10,7 +14,7 @@ data = sys.argv[1]
 
 
 # for title in data:
-url = f'https://mysapl.bibliocommons.com/v2/search?searchType=keyword&query=${data}&f_FORMAT=EBOOK%7CBK%7CGRAPHIC_NOVEL%7CLPRINT%7CAB'
+url = f'https://mysapl.bibliocommons.com/v2/search?searchType=keyword&query={data}&f_FORMAT=EBOOK%7CBK%7CGRAPHIC_NOVEL%7CLPRINT%7CAB'
 session = requests.Session()
 retry_strategy = Retry(
     total=5,  # Total number of retries
@@ -41,16 +45,34 @@ if results != None:
     results = results.find_all('span', class_= 'title-content')
     if (results[0].parent):
         new_url = 'https://mysapl.bibliocommons.com'+results[0].parent.attrs['href']
-        driver = webdriver.Chrome()
+
+        chrome_options = Options()
+
+        # Add the headless argument (the recommended format)
+        chrome_options.add_argument("--headless=new") 
+
+        # Optional optimization flags for headless stability
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--window-size=1920,1080")
+
+        
+        driver = webdriver.Chrome(chrome_options)
         driver.get(new_url)
+        details_link = driver.find_element(By.CSS_SELECTOR, "[data-key='full-details-link']")
+        details_link.click()
 
-        # Locate the button and click it using Selenium
-        button = driver.find_element(By.LINK_TEXT, "https://mysapl.bibliocommons.com/#full-details-overlay")
-        button.click()
+        age_rating = driver.find_element(By.CSS_SELECTOR, "[data-key='bib-details-full-screen-overlay']")
 
-        newResponse = session.get(new_url)
-        book_page = BeautifulSoup(driver.page_source, 'html.parser')
-        print(book_page.prettify())
+        details_popup = BeautifulSoup(age_rating.get_attribute("outerHTML"), 'html.parser')
+        potential_age_info = details_popup.find_all('span', class_ = 'formatted-value')
+
+        age_info = [element for element in potential_age_info if 'juvenile beginner' in element.text.lower() or 'juvenile fiction' in element.text.lower() or 'young adult' in element.text.lower()]
+
+        if age_info != []:
+            print(age_info[len(age_info)-1])
+        else:
+            print('Adult')
+
 else:
-    print(False)
+    print('Error Retrieving Age')
 sys.stdout.flush()

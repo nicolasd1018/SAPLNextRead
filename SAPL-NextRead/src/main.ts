@@ -1,7 +1,6 @@
 import { app, BrowserWindow, ipcMain, Options } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
-import checkCatalogue from './services/CheckCatalogue';
 import { PythonShell } from 'python-shell';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -39,7 +38,7 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 };
 
-ipcMain.handle('run-python', async (event, text) => {
+ipcMain.handle('run-web-scraper', async (event, text) => {
     let options: Options = {
         mode: 'text',
         args: [text] // Your string is passed as a command line argument
@@ -47,6 +46,21 @@ ipcMain.handle('run-python', async (event, text) => {
 
     return new Promise((resolve, reject) => {
         PythonShell.run('Web_Scraper/web_scaper.py', options).then(messages => {
+            resolve(messages); // Returns array of printed outputs from Python
+        }).catch(err => {
+            reject(err);
+        });
+    });
+});
+
+ipcMain.handle('run-age-finder', async (event, text) => {
+    let options: Options = {
+        mode: 'text',
+        args: [text] // Your string is passed as a command line argument
+    };
+
+    return new Promise((resolve, reject) => {
+        PythonShell.run('Web_Scraper/age_finder.py', options).then(messages => {
             resolve(messages); // Returns array of printed outputs from Python
         }).catch(err => {
             reject(err);

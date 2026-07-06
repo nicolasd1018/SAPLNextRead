@@ -34,6 +34,8 @@ class BookPage extends HTMLElement {
 
             if (title && bookTitle && bookTitle instanceof HTMLElement){
                 bookTitle.innerHTML = title;
+                const result = await window.electronAPI.runAgeFinder(title.replaceAll('%', '%25').replaceAll(' ', '%20'));
+                console.log(result);
             }
 
             if (author && authorText && authorText instanceof HTMLElement){

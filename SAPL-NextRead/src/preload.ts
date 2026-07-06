@@ -4,6 +4,7 @@ import { contextBridge, ipcRenderer } from "electron";
 
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 contextBridge.exposeInMainWorld('electronAPI', {
-    runPythonScript: (text: string  ) => ipcRenderer.invoke('run-python', text)
+    runWebScraper: (text: string  ) => ipcRenderer.invoke('run-web-scraper', text),
+    runAgeFinder: (text: string) => ipcRenderer.invoke('run-age-finder', text)
 });
     
