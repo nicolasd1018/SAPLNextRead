@@ -41,6 +41,8 @@ export class MainPage extends HTMLElement {
         const rightArrow = this.shadowRoot.getElementById("right-arrow");
         const leftArrow = this.shadowRoot.getElementById("left-arrow");
         const loadingScreen = this.shadowRoot.getElementById('loading-screen');
+        const filterButton = this.shadowRoot.getElementById('filter-button');
+        const filterModal = this.shadowRoot.getElementById('filter-modal');
         let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');;
         let x = -1;
         let iteration = 0;
@@ -135,7 +137,13 @@ export class MainPage extends HTMLElement {
             })
         }
 
-        
+        if (filterButton && filterButton instanceof HTMLButtonElement){
+            filterButton.addEventListener('click',()=>{
+                if (filterModal && filterModal instanceof HTMLElement){
+                    filterModal.style.display = 'flex';
+                }
+            });
+        }
     }
   }
 }

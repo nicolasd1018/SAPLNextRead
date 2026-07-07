@@ -12,7 +12,59 @@
         align-items: center;
         position: fixed;
     }
+    #filter-modal-container{
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        width: 401.99px;
+        gap: 15px;
+    }
+    #close-button{
+        background-color: #602983;
+        color: white;
+        border-width: 0px;
+        width: fit-content;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    #close-button:hover{
+        background-color: red;
+        cursor: pointer;
+    }
+    #tab-menu{
+        flex-direction: row;
+        display: flex;
+        border-color:  #602983;
+        border-bottom-width: 2px;
+        width: fit-content;
+    }
+    .tab-button{
+        background-color: #602983;
+        color: white;
+        padding: 0;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .tab-button:hover{
+        background-color: white;
+        color: #602983;
+        cursor: pointer;
+    }
+    .tab-button.selected{
+        background-color: white;
+        color: #602983;
+    }
 </style>
 
 <div id="modal-background" >
+    <div id="filter-modal-container">
+        <div id="tab-menu">
+            <div id="genre" class="tab-button">Genre</div>
+            <div id="mood" class="tab-button">Mood</div>
+            <div id="content-warning" class="tab-button">Content Warning</div>
+            <div id="misc" class="tab-button">Miscellaneous</div>
+            <div id="close-button">x</div>
+        </div>
+        <tag-menu tag-type="genre"></tag-menu>
+    </div>
 </div>

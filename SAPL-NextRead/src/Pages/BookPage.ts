@@ -1,7 +1,6 @@
 import templateString from '../Pages/BookPage.template.html?raw';
 
 class BookPage extends HTMLElement {
-    private _genres: string[] = [];
 
     constructor() {
         super();

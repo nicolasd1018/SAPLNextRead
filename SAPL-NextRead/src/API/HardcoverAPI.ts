@@ -106,5 +106,17 @@ export const getRecommendations = async (title: string, iteration?: number): Pro
     
     console.log(reccomendation);
     return  reccomendation;
+}
 
+export const getAllGenres = async (iteration: number = 0) =>{
+    let tags: {data: {tags: {tag: string}[]}} = await client
+    .query({
+        query: gql`
+        query MyQuery {
+            tags(where: {tag_category_id: {_eq: 1}}, order_by: {count: desc_nulls_last} offset:${100*iteration} limit:20) {
+                tag
+            }
+        }
+        `, errorPolicy: 'all'}) as {data: {tags: {tag: string}[]}};
+    return tags.data.tags.map((tag)=> tag.tag);
 }

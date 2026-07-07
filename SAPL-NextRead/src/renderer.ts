@@ -62,6 +62,10 @@ export const changePage = (book: book | undefined = undefined) => {
   }
 }
 
+export const setGenreFilter = () => {
+  
+}
+
 
 document.body.appendChild(header);
 document.body.appendChild(mainPage);
