@@ -8,6 +8,7 @@
         height: 45px;
         align-items: center;
         border-bottom: 5px solid #602983;
+        justify-content: space-between;
     }
     nextread-searchbar{
         display: flex;
@@ -29,6 +30,7 @@
         display: flex; 
         align-items: center; 
         height: calc(23vw*1.5);
+        gap: 10vw;
     }
     #right-arrow{
         transform: scaleX(-1); 
@@ -39,13 +41,35 @@
         position: absolute;
         display: none;
     }
+    #filter-button{
+        margin-right: 10px;
+        height: 29px;
+        width: 158px;
+        background-color: white;
+        font-size: 24px;
+        font-weight: bold;
+        :hover{
+            cursor: pointer;
+        }
+    }
+    #filter-button:hover { 
+        cursor: pointer; 
+    }
+    .book-cover:hover{
+        cursor: pointer;
+    }
+    filter-modal{
+        display: flex;
+    }
 </style>
 <nextread-loading-screen id="loading-screen"></nextread-loading-screen>
+<filter-modal></filter-modal>
 <div id="SNR-main-container" aria-label="mainPageContainer">
     <div id="search-rows" >
         <nextread-searchbar></nextread-searchbar>
+        <button id="filter-button">Filter</button>
     </div>
-    <div id="book-carousel" >
+    <div id="book-carousel">
          <img id="left-arrow" src="/Arrow.png" />
         <div id="book-space"></div>
         <img id="right-arrow" src="/Arrow.png" />

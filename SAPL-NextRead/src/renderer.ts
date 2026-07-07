@@ -48,8 +48,11 @@ export const changePage = (book: book | undefined = undefined) => {
     bookPage.setAttribute('title', book.title);
     bookPage.setAttribute('subtitle', book.subtitle);
     bookPage.setAttribute('author', book.contributions[0].author.name);
-    bookPage.setAttribute('description', book.description)
-    bookPage.setAttribute('id', String(book.id))
+    bookPage.setAttribute('description', book.description);
+    bookPage.setAttribute('id', String(book.id));
+    bookPage.setAttribute('genres', book.genres.map((genre)=> genre.tag.tag).toString());
+    bookPage.setAttribute('moods', book.moods.map((genre)=> genre.tag.tag).toString());
+    bookPage.setAttribute('contentWarnings', book.contentWarnings.map((genre)=> genre.tag.tag).toString());
 
     document.body.append(bookPage);
   }

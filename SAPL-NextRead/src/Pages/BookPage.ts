@@ -1,16 +1,16 @@
-import { getContentWarnings, getGenres, getMoods } from '../API/HardcoverAPI';
 import templateString from '../Pages/BookPage.template.html?raw';
 
 class BookPage extends HTMLElement {
+    private _genres: string[] = [];
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
     }
 
     static get observedAttributes() {
-    return ["title", "author", "description", "imgUrl", "subtitle", 'id'];
-  }
-
+        return ["title", "author", "description", "imgUrl", "subtitle", 'id', 'genres', 'moods', 'contentWarning'];
+    }
 
     async connectedCallback() {
         if (this.shadowRoot) {
@@ -23,10 +23,12 @@ class BookPage extends HTMLElement {
             const authorText = this.shadowRoot.getElementById('author');
             const description = this.getAttribute('description');
             const descriptionText = this.shadowRoot.getElementById('description');
-            const id = this.getAttribute('id');
             const genreSpace = this.shadowRoot.getElementById('genre-space');
+            const genres = this.getAttribute('genres');
             const warningSpace = this.shadowRoot.getElementById('warning-space');
+            const contentWarnings = this.getAttribute('contentWarnings');
             const moodSpace = this.shadowRoot.getElementById('mood-space');
+            const moods = this.getAttribute('moods');
 
             if (imgUrl && bookCover && bookCover instanceof HTMLImageElement){
                 bookCover.src = imgUrl;
@@ -46,25 +48,28 @@ class BookPage extends HTMLElement {
                 descriptionText.innerHTML = description;
             }
 
-            if (id){
-                const genres = await getGenres(Number(id));
-                genres.forEach((genre, index) => {
+            if (genres && genreSpace){
+                genres.split(',').forEach((genre, index) => {
                     const genreTag = document.createElement('div');
                     genreTag.id = `genre-tag-${index}`;
                     genreTag.className = 'tag';
                     genreTag.innerText = genre;
                     genreSpace?.appendChild(genreTag);
                 });
-                const contentWarnings = await getContentWarnings(Number(id));
-                contentWarnings.forEach((warning, index)=>{
+            }
+
+            if (contentWarnings && warningSpace) {
+                contentWarnings.split(',').forEach((warning, index)=>{
                     const warningTag = document.createElement('div');
                     warningTag.id = `warning-tag-${index}`;
                     warningTag.className = 'tag';
                     warningTag.innerText = warning;
                     warningSpace?.appendChild(warningTag);
                 });
-                const moods = await getMoods(Number(id));
-                moods.forEach((mood, index)=>{
+            }
+
+            if (moodSpace && moods) {
+                moods.split(',').forEach((mood, index)=>{
                     const moodTag = document.createElement('div');
                     moodTag.id = `mood-tag-${index}`;
                     moodTag.className = 'tag';
@@ -72,6 +77,7 @@ class BookPage extends HTMLElement {
                     moodSpace?.appendChild(moodTag);
                 });
             }
+
         }
     }
 }

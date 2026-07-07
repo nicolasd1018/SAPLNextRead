@@ -1,5 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache, gql } from "@apollo/client";
 import { SetContextLink } from "@apollo/client/link/context";
+import { re } from "mathjs";
 
 const authLink = new SetContextLink(({ headers }) => {
   return {
@@ -26,7 +27,9 @@ export interface book {
     contributions: {author: {name:string}}[]
     description: string
     subtitle: string
-    genres: {tag: {tagName: string}}[]
+    genres: {tag: {tag: string}}[]
+    contentWarnings: {tag: {tag: string}}[]
+    moods: {tag: {tag: string}}[]
 }
 // const client = ...
 export const getRecommendations = async (title: string, iteration?: number): Promise<book[]>=> {
@@ -49,6 +52,30 @@ export const getRecommendations = async (title: string, iteration?: number): Pro
         description
         }
 
+        fragment genres on books{
+        genres: taggable_counts(where: {tag: {tag_category_id: {_eq: 1}}}order_by: {count: desc_nulls_last} limit: 5){
+                tag{
+                    tag
+                }
+            }
+        }
+
+        fragment contentWarnings on books {
+        contentWarnings: taggable_counts(where: {tag: {tag_category_id: {_eq: 3}}}order_by: {count: desc_nulls_last}){
+                tag{
+                    tag
+                }
+            }
+        }
+
+        fragment moods on books{
+            moods: taggable_counts(where: {tag: {tag_category_id: {_eq: 4}}}order_by: {count: desc_nulls_last} limit: 5){
+                tag{
+                    tag
+                }
+            }
+        }
+
         query MyQuery {
             books (where: {_and: [{title: {_eq: "${title}"}}, {users_read_count: {_gt: 0}}]})
             {
@@ -62,6 +89,9 @@ export const getRecommendations = async (title: string, iteration?: number): Pro
                     book {
                         ...cover
                         ...information
+                        ...genres
+                        ...contentWarnings
+                        ...moods
                     }
                     }
                 }
@@ -73,65 +103,8 @@ export const getRecommendations = async (title: string, iteration?: number): Pro
     }).then((result) => { 
         reccomendation = [...new Set((result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat().map((b)=> b.book))];
     })
-    return reccomendation
+    
+    console.log(reccomendation);
+    return  reccomendation;
+
 }
-
-export const getGenres = async ( bookID: number) => {
-    let genres: string[] = [];
-    await client
-    .query({
-        query: gql`
-        {
-        books(where: {id: {_eq: ${bookID}}}){
-            taggable_counts(where: {tag: {tag_category_id: {_eq: 1}}}order_by: {count: desc_nulls_last} limit: 5){
-            tag{
-                tag
-            }
-            }
-        }
-        }`
-    }).then((result) => {
-        genres = [...(result.data as {books: {taggable_counts: {tag: {tag: string}}[]}[]}).books[0].taggable_counts.map((taggable_counts)=>taggable_counts.tag.tag)].sort();
-    });
-    return genres;
-} 
-
-export const getContentWarnings = async ( bookID: number) => {
-    let contentWarnings: string[] = [];
-    await client
-    .query({
-        query: gql`
-        {
-        books(where: {id: {_eq: ${bookID}}}){
-            taggable_counts(where: {tag: {tag_category_id: {_eq: 3}}}order_by: {count: desc_nulls_last}){
-            tag{
-                tag
-            }
-            }
-        }
-        }`
-    }).then((result) => {
-        contentWarnings = [...(result.data as {books: {taggable_counts: {tag: {tag: string}}[]}[]}).books[0].taggable_counts.map((taggable_counts)=>taggable_counts.tag.tag)].sort();
-    });
-    return contentWarnings;
-} 
-
-export const getMoods = async ( bookID: number) => {
-    let moods: string[] = [];
-    await client
-    .query({
-        query: gql`
-        {
-        books(where: {id: {_eq: ${bookID}}}){
-            taggable_counts(where: {tag: {tag_category_id: {_eq: 4}}}order_by: {count: desc_nulls_last} limit: 5){
-            tag{
-                tag
-            }
-            }
-        }
-        }`
-    }).then((result) => {
-        moods = [...(result.data as {books: {taggable_counts: {tag: {tag: string}}[]}[]}).books[0].taggable_counts.map((taggable_counts)=>taggable_counts.tag.tag)].sort();
-    });
-    return moods;
-} 
