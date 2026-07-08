@@ -101,10 +101,13 @@ export const getRecommendations = async (title: string, iteration?: number): Pro
     `,
         errorPolicy: 'all'
     }).then((result) => { 
-        reccomendation = [...new Set((result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat().map((b)=> b.book))];
+        if ((result.data as response).books.length ===0 ) {
+            reccomendation = []
+        }
+        else
+         reccomendation = [...new Set((result.data as response).books.filter((a)=> a.user_books.length !== 0)[0].user_books.map((ub)=> ub.user).map((u)=>u.user_books).flat().map((b)=> b.book))];
     })
-    
-    console.log(reccomendation);
+    .catch((error)=>console.log(error));
     return  reccomendation;
 }
 

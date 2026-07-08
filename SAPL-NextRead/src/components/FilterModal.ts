@@ -1,4 +1,3 @@
-import { getAllGenres } from '../API/HardcoverAPI';
 import templateString from '../components/FilterModal.template.html?raw';
 import './tagMenu';
 export default class FilterModal extends HTMLElement{

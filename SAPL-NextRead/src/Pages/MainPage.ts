@@ -4,6 +4,7 @@ import '../components/Searchbar.js';
 import { changePage } from '../renderer';
 import '../components/LoadingScreen';
 import '../components/FilterModal';
+import '../components/ErrorModal'
 
 
 
@@ -43,6 +44,7 @@ export class MainPage extends HTMLElement {
         const loadingScreen = this.shadowRoot.getElementById('loading-screen');
         const filterButton = this.shadowRoot.getElementById('filter-button');
         const filterModal = this.shadowRoot.getElementById('filter-modal');
+        const errorModal = this.shadowRoot.getElementById('error-modal');
         let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');;
         let x = -1;
         let iteration = 0;
@@ -57,26 +59,33 @@ export class MainPage extends HTMLElement {
                     loadingScreen!.style.display = 'flex';
                     this.#books = await getRecommendations(searchBar.value);
                     // filter out all the duplicates
-                    this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
-
-                    // check to see if books are available in SAPL catalogue and filter out the ones that aren't
-                    this.#books = await this.availabilityCheck(this.#books);
-                    loadingScreen!.style.display = 'none';
-                    this.fillBookCarousel(this.#books, bookSpace!, x);
-                    if (bookSpace && bookSpace instanceof HTMLElement)
-                    {
-                        bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
-                        if (bookCovers) {
-                            bookCovers.forEach((bc)=> {
-                                const bookIndex = Number(bc.getAttribute('data-book-index'));
-                                if (bookIndex >= 0){
-                                    bc.addEventListener("click", async (event) => {
-                                        changePage(this.#books[bookIndex])
-                                    })
-                                }
-                            })
+                    if (this.#books.length > 0) {
+                        this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
+                    
+                        // check to see if books are available in SAPL catalogue and filter out the ones that aren't
+                        this.#books = await this.availabilityCheck(this.#books);//.catch((lookUpError) => console.log(lookUpError));
+                    
+                        
+                        this.fillBookCarousel(this.#books, bookSpace!, x);
+                        if (bookSpace && bookSpace instanceof HTMLElement)
+                        {
+                            bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
+                            if (bookCovers) {
+                                bookCovers.forEach((bc)=> {
+                                    const bookIndex = Number(bc.getAttribute('data-book-index'));
+                                    if (bookIndex >= 0){
+                                        bc.addEventListener("click", async (event) => {
+                                            changePage(this.#books[bookIndex])
+                                        })
+                                    }
+                                })
+                            }
                         }
                     }
+                    else if (errorModal && errorModal instanceof HTMLElement){
+                        errorModal.style.display = 'flex';
+                    }
+                    loadingScreen!.style.display = 'none';
                 }
             });
         }
