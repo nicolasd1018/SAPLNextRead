@@ -116,7 +116,7 @@ export const getAllGenres = async (iteration: number = 0) =>{
     .query({
         query: gql`
         query MyQuery {
-            tags(where: {tag_category_id: {_eq: 1}}, order_by: {count: desc_nulls_last} offset:${100*iteration} limit:20) {
+            tags(where: {tag_category_id: {_eq: 1}}, order_by: {count: desc_nulls_last} offset:${50*iteration} limit: 50 ) {
                 tag
             }
         }

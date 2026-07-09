@@ -16,11 +16,27 @@
         background-color: white;
         display: flex;
         padding: 10px;
+        width: 250px;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+    #close-button{
+        width: fit-content;
+    }
+    #message{
+        text-align: center;
+    }
+    #title{
+        font-weight: bold;
+        font-size: large;
     }
 </style>
 
 <div id="modal-background">
     <div id="error-container">
-        <div>There has been an error finding books like the one  entered. The most likely explanation is that the title was input incorrectly. Please try again with the exact title, including exact capitalization, punctuation, and spacing.</title></div>
+        <div id="title"></div>
+        <div id="message"></div>
+        <button id="close-button">Close</button>
     </div>
 </div>

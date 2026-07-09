@@ -6,6 +6,10 @@ export default class ErrorModal extends HTMLElement{
         this.attachShadow({ mode: 'open' });
     }
 
+    static get observedAttributes() {
+        return ['error-title', 'error-message'];
+    }
+
     async connectedCallback() {
         if (this.shadowRoot) {
             this.shadowRoot.innerHTML = templateString;
@@ -13,9 +17,23 @@ export default class ErrorModal extends HTMLElement{
             
             if (closeButton && closeButton instanceof HTMLElement){
                 closeButton.addEventListener('click', ()=>{
-                    this.shadowRoot?.querySelectorAll('.tab-button.selected').forEach((button)=> button.classList.toggle('selected'));
                     this.style.display = 'none';
                 });
+            }
+        }
+    }
+
+    addInformation() {
+        if (this.shadowRoot) {
+            const title = this.shadowRoot.getElementById('title');
+            const message = this.shadowRoot.getElementById('message');
+
+            if(title && title instanceof HTMLElement ) {
+                title.innerText = this.getAttribute('error-title')!;
+            }
+
+            if (message && message instanceof HTMLElement) {
+                message.innerText = this.getAttribute('error-message')!;
             }
         }
     }

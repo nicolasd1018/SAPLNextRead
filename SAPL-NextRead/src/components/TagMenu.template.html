@@ -4,12 +4,21 @@
         display: flex;
         gap: 5px;
         flex-direction: column;
+        padding: 10px;
     }
     .tag{
         background-color: #602983;
         color: white;
         padding-left: 5px;
         padding-right: 5px;
+        border: 2px solid #602983; 
+    }
+    .tag.selected{
+        color: #602983;
+        background-color: white;
+        padding-left: 5px;
+        padding-right: 5px;
+        border: 2px solid #602983; 
     }
     .tag:hover{
         cursor: pointer;
@@ -18,10 +27,21 @@
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+        overflow-y: scroll; 
+        max-height: 200px;
+    }
+    #search-holder{
+        display: flex;
+        gap: 10px;
     }
 </style>
 
 <div id="tag-space">
+
+    <div id="search-holder">
+        <div>Search</div>
+        <input type="search" id="search-bar"></input>
+    </div>
     <div id="white-list-label" class="label">
         White List
     </div>

@@ -5,6 +5,7 @@ import { changePage } from '../renderer';
 import '../components/LoadingScreen';
 import '../components/FilterModal';
 import '../components/ErrorModal'
+import ErrorModal from '../components/ErrorModal';
 
 
 
@@ -83,6 +84,9 @@ export class MainPage extends HTMLElement {
                         }
                     }
                     else if (errorModal && errorModal instanceof HTMLElement){
+                        errorModal.setAttribute('error-title', 'Search Input Error');
+                        errorModal.setAttribute('error-message', 'There has been an error finding books like the one  entered. The most likely explanation is that the title was input incorrectly. Please try again with the exact title, including exact capitalization, punctuation, and spacing.');
+                        (errorModal as ErrorModal).addInformation();
                         errorModal.style.display = 'flex';
                     }
                     loadingScreen!.style.display = 'none';
