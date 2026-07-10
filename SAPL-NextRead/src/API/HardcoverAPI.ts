@@ -30,6 +30,7 @@ export interface book {
     genres: {tag: {tag: string}}[]
     contentWarnings: {tag: {tag: string}}[]
     moods: {tag: {tag: string}}[]
+    ageRating: string
 }
 // const client = ...
 export const getRecommendations = async (title: string, iteration?: number): Promise<book[]>=> {

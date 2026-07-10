@@ -43,36 +43,7 @@ page = BeautifulSoup(response.text, 'html.parser')
 results = page.find('ul', class_='results')
 if results != None:
     results = results.find_all('span', class_= 'title-content')
-    if (results[0].parent):
-        new_url = 'https://mysapl.bibliocommons.com'+results[0].parent.attrs['href']
-
-        chrome_options = Options()
-
-        # Add the headless argument (the recommended format)
-        chrome_options.add_argument("--headless=new") 
-
-        # Optional optimization flags for headless stability
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--window-size=1920,1080")
-
-        
-        driver = webdriver.Chrome(chrome_options)
-        driver.get(new_url)
-        details_link = driver.find_element(By.CSS_SELECTOR, "[data-key='full-details-link']")
-        details_link.click()
-
-        age_rating = driver.find_element(By.CSS_SELECTOR, "[data-key='bib-details-full-screen-overlay']")
-
-        details_popup = BeautifulSoup(age_rating.get_attribute("outerHTML"), 'html.parser')
-        potential_age_info = details_popup.find_all('span', class_ = 'formatted-value')
-
-        age_info = [element for element in potential_age_info if 'juvenile beginner' in element.text.lower() or 'juvenile fiction' in element.text.lower() or 'young adult' in element.text.lower()]
-
-        if age_info != []:
-            print(age_info[len(age_info)-1])
-        else:
-            print('Adult')
-
+    age_rating =[element.parent.parent.parent.parent.parent.parent  for element in results if element.get_text() == data.replace('%20', " ") and element.parent.parent.find('span', class_= 'cp-subtitle') is None][0].find_all('span', class_= 'call-number')
 else:
     print('Error Retrieving Age')
 sys.stdout.flush()
