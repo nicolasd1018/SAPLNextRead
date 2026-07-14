@@ -27,17 +27,20 @@ export class MainPage extends HTMLElement {
 
     async availabilityCheck(books: book[]){
         // books.forEach(async (book)=> {
-        //     const age = await window.electronAPI.runAgeFinder(book.title.replaceAll('%', '%25').replaceAll(' ', '%20'));
+        //     const usableSubtitle = book.title.includes(book.subtitle);
+        //     const age = await window.electronAPI.runAgeFinder(book.title.replace(book.title, '').replaceAll('%', '%25').replaceAll(' ', '%20'), usableSubtitle ? book.subtitle : '');
         //     book.ageRating = age[0];
         //     console.log(book.title, book.ageRating);
         // });
         const asyncResults = await Promise.all(
                         this.#books.map(async (book, index) => {
-                            const result = await window.electronAPI.runAgeFinder(book.title.replaceAll('%', '%25').replaceAll(' ', '%20'));
-                            return {index: index, present: result[0] !== 'True'};
+                            const usableSubtitle = book.title.includes(book.subtitle) ? book.subtitle : '';
+                            const age = await window.electronAPI.runAgeFinder(book.title.replace(book.subtitle, '').replace(usableSubtitle, '').replaceAll('%', '%25').replaceAll(' ', '%20'), usableSubtitle );
+                            return {index: index, age: age[0] };
                         })
                     );
-             
+        // books.forEach((book)=> console.log(book.title, book.ageRating));
+        books.forEach((book, index) => book.ageRating = asyncResults[index].age! )
         return books.filter((book)=> book.ageRating !== 'Error Retrieving Age');
     }
 
@@ -71,7 +74,7 @@ export class MainPage extends HTMLElement {
                     
                         // check to see if books are available in SAPL catalogue and filter out the ones that aren't
                         this.#books = await this.availabilityCheck(this.#books);//.catch((lookUpError) => console.log(lookUpError));
-                    
+                        console.log(this.#books);
                         
                         this.fillBookCarousel(this.#books, bookSpace!, x);
                         if (bookSpace && bookSpace instanceof HTMLElement)

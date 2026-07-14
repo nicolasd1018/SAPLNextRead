@@ -14,7 +14,7 @@ data = sys.argv[1]
 
 
 # for title in data:
-url = f'https://mysapl.bibliocommons.com/v2/search?searchType=keyword&query={data}&f_FORMAT=EBOOK%7CBK%7CGRAPHIC_NOVEL%7CLPRINT%7CAB'
+url = f'https://mysapl.bibliocommons.com/v2/search?searchType=keyword&query={data}&f_FORMAT=BK%7CAB%7CBOOK_CD%7CEBOOK%7CPAPERBACK%7CGRAPHIC_NOVEL%7CLPRINT%7CPICTURE_BOOK'
 session = requests.Session()
 retry_strategy = Retry(
     total=5,  # Total number of retries
@@ -41,9 +41,12 @@ except requests.exceptions.RequestException as e:
 # response = requests.get(url, {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
 page = BeautifulSoup(response.text, 'html.parser')
 results = page.find('ul', class_='results')
-if results != None:
+# print(url)
+try:
     results = results.find_all('span', class_= 'title-content')
-    age_rating =[element.parent.parent.parent.parent.parent.parent  for element in results if element.get_text() == data.replace('%20', " ") and element.parent.parent.find('span', class_= 'cp-subtitle') is None][0].find_all('span', class_= 'call-number')
-else:
+    genre_tags =[element.parent.parent.parent.parent.parent.parent.parent  for element in results if element.get_text().lower() == data.replace('%20', " ").lower() ][0].find_all('span', class_= 'call-number')
+    age_rating = [element for element in genre_tags if element.get_text() != ''] 
+    print(age_rating[0])
+except:
     print('Error Retrieving Age')
 sys.stdout.flush()
