@@ -25,13 +25,7 @@ export class MainPage extends HTMLElement {
                     bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+2}" class="book-cover" src=${books[x+2].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
     }
 
-    async availabilityCheck(books: book[]){
-        // books.forEach(async (book)=> {
-        //     const usableSubtitle = book.title.includes(book.subtitle);
-        //     const age = await window.electronAPI.runAgeFinder(book.title.replace(book.title, '').replaceAll('%', '%25').replaceAll(' ', '%20'), usableSubtitle ? book.subtitle : '');
-        //     book.ageRating = age[0];
-        //     console.log(book.title, book.ageRating);
-        // });
+    async availabilityCheck(books: book[]) {
         const asyncResults = await Promise.all(
                         this.#books.map(async (book, index) => {
                             const usableSubtitle = book.title.includes(book.subtitle) ? book.subtitle : '';
