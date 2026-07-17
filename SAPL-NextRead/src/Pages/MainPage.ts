@@ -27,14 +27,16 @@ export class MainPage extends HTMLElement {
 
     async availabilityCheck(books: book[]) {
         const asyncResults = await Promise.all(
-                        this.#books.map(async (book, index) => {
+                        books.map(async (book) => {
                             const usableSubtitle = book.title.includes(book.subtitle) ? book.subtitle : '';
                             const age = await window.electronAPI.runAgeFinder(book.title.replace(book.subtitle, '').replace(usableSubtitle, '').replaceAll('%', '%25').replaceAll(' ', '%20'), usableSubtitle );
-                            return {index: index, age: age[0] };
+                            console.log(age);
+                            return {index: book.id, age: age[0] };
                         })
                     );
         // books.forEach((book)=> console.log(book.title, book.ageRating));
-        books.forEach((book, index) => book.ageRating = asyncResults[index].age! )
+        console.log(asyncResults);
+        books.forEach((book) => {console.log(book.id);book.ageRating = asyncResults.find((result)=> result.index === book.id)!.age!;} )
         return books.filter((book)=> book.ageRating !== 'Error Retrieving Age');
     }
 

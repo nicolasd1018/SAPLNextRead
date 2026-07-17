@@ -46,7 +46,16 @@ try:
     results = results.find_all('span', class_= 'title-content')
     genre_tags =[element.parent.parent.parent.parent.parent.parent.parent  for element in results if element.get_text().lower() == data.replace('%20', " ").lower() ][0].find_all('span', class_= 'call-number')
     age_rating = [element for element in genre_tags if element.get_text() != ''] 
-    print(age_rating[0])
+    if ('juvenile easy' in age_rating[0].get_text().lower() or 'board book' in age_rating[0].get_text().lower()):
+        print('Toddler')
+    elif ('juvenile beginner' in age_rating[0].get_text().lower()):
+        print('Juvenile Beginner')
+    elif ('juvenile' in age_rating[0].get_text().lower()):
+        print('Juvenile')
+    elif ('young adult' in age_rating[0].get_text().lower()):
+        print('Young Adult')
+    else: 
+        print('Adult')
 except:
     print('Error Retrieving Age')
 sys.stdout.flush()

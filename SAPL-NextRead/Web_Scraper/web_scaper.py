@@ -38,7 +38,6 @@ page = BeautifulSoup(response.text, 'html.parser')
 results = page.find('ul', class_='results')
 if results != None:
     results = results.find_all('span', class_= 'title-content')
-    results[0].get_text()
     print(any(element.get_text() == data.replace('%20', " ") for element in results))
 else:
     print(False)

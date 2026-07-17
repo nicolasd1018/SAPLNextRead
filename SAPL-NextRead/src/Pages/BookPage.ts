@@ -8,7 +8,7 @@ class BookPage extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ["title", "author", "description", "imgUrl", "subtitle", 'id', 'genres', 'moods', 'contentWarning'];
+        return ["bookTitle", "author", "description", "imgUrl", "subtitle", 'id', 'genres', 'moods', 'contentWarning', 'ageRating'];
     }
 
     async connectedCallback() {
@@ -16,7 +16,7 @@ class BookPage extends HTMLElement {
             this.shadowRoot.innerHTML = templateString;
             const imgUrl = this.getAttribute('imgUrl');
             const bookCover = this.shadowRoot.getElementById('book-cover');
-            const title = this.getAttribute('title');
+            const title = this.getAttribute('bookTitle');
             const bookTitle = this.shadowRoot.getElementById('title');
             const author = this.getAttribute('author');
             const authorText = this.shadowRoot.getElementById('author');
@@ -28,6 +28,8 @@ class BookPage extends HTMLElement {
             const contentWarnings = this.getAttribute('contentWarnings');
             const moodSpace = this.shadowRoot.getElementById('mood-space');
             const moods = this.getAttribute('moods');
+            const ageTag = this.shadowRoot.getElementById('age-rating');
+            const ageRating = this.getAttribute('ageRating');
 
             if (imgUrl && bookCover && bookCover instanceof HTMLImageElement){
                 bookCover.src = imgUrl;
@@ -35,8 +37,6 @@ class BookPage extends HTMLElement {
 
             if (title && bookTitle && bookTitle instanceof HTMLElement){
                 bookTitle.innerHTML = title;
-                const result = await window.electronAPI.runAgeFinder(title.replaceAll('%', '%25').replaceAll(' ', '%20'));
-                console.log(result);
             }
 
             if (author && authorText && authorText instanceof HTMLElement){
@@ -77,6 +77,24 @@ class BookPage extends HTMLElement {
                 });
             }
 
+            if (ageRating && ageTag) {
+                ageTag.innerText = ageRating;
+                if (ageRating === 'Toddler') {
+                    ageTag.title = 'Under 5'
+                }
+                else if (ageRating === 'Juvenile Beginner') {
+                    ageTag.title = '5 to 7'
+                }
+                else if (ageRating === 'Juvenile') {
+                    ageTag.title = '8 to 12'
+                }
+                else if (ageRating === 'Young Adult') {
+                    ageTag.title = '13 to 18'
+                }
+                else if (ageRating === 'Adult') {
+                    ageTag.title = 'Not written with children in mind'
+                }
+            }
         }
     }
 }
