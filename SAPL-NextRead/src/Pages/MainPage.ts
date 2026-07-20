@@ -20,7 +20,7 @@ export class MainPage extends HTMLElement {
     fillBookCarousel(books: book[], bookSpace: HTMLElement, x: number) {
         bookSpace!.innerHTML = ''
                     
-                    bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x}" class="book-cover" src=${x < 0 ? "/placeholder.png" : books[x].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
+                    bookSpace!.innerHTML += x < 0 ? '<div style="width: 15vw; height: calc(15vw * 1.5);"></div>':`<img id="book-cover" data-book-index="${x}" class="book-cover" src=${books[x].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
                     bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+1}" class="book-cover" src=${books[x+1].image.url} style="width: 23vw; height: calc(23vw * 1.5);">`;
                     bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+2}" class="book-cover" src=${books[x+2].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
     }

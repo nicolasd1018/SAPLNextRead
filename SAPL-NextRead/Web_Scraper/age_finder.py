@@ -56,6 +56,8 @@ try:
         print('Young Adult')
     else: 
         print('Adult')
-except:
+except Exception as err:
+    # case if results == None:
+        
     print('Error Retrieving Age')
 sys.stdout.flush()

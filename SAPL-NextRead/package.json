@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@apollo/client": "^4.2.1",
+    "better-sqlite3": "^12.11.1",
     "electron-squirrel-startup": "^1.0.1",
     "graphql": "^16.14.1",
     "python-shell": "^5.0.0",
