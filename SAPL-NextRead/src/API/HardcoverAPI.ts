@@ -124,3 +124,29 @@ export const getAllGenres = async (iteration: number = 0) =>{
         `, errorPolicy: 'all'}) as {data: {tags: {tag: string}[]}};
     return tags.data.tags.map((tag)=> tag.tag);
 }
+
+export const getAllContentWarnings = async (iteration: number = 0) =>{
+    let tags: {data: {tags: {tag: string}[]}} = await client
+    .query({
+        query: gql`
+        query MyQuery {
+            tags(where: {tag_category_id: {_eq: 3}}, order_by: {count: desc_nulls_last} offset:${50*iteration} limit: 50 ) {
+                tag
+            }
+        }
+        `, errorPolicy: 'all'}) as {data: {tags: {tag: string}[]}};
+    return tags.data.tags.map((tag)=> tag.tag);
+}
+
+export const getAllMoods = async (iteration: number = 0) =>{
+    let tags: {data: {tags: {tag: string}[]}} = await client
+    .query({
+        query: gql`
+        query MyQuery {
+            tags(where: {tag_category_id: {_eq: 4}}, order_by: {count: desc_nulls_last} offset:${50*iteration} limit: 50 ) {
+                tag
+            }
+        }
+        `, errorPolicy: 'all'}) as {data: {tags: {tag: string}[]}};
+    return tags.data.tags.map((tag)=> tag.tag);
+}
