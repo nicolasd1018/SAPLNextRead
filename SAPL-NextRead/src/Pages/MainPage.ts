@@ -11,7 +11,8 @@ import ErrorModal from '../components/ErrorModal';
 
 
 export class MainPage extends HTMLElement {
-    #books: book[] = []
+    #books: book[] = [];
+    useState: UseState = {whiteList:[], blackList:[]};
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -23,6 +24,11 @@ export class MainPage extends HTMLElement {
                     bookSpace!.innerHTML += x < 0 ? '<div style="width: 15vw; height: calc(15vw * 1.5);"></div>':`<img id="book-cover" data-book-index="${x}" class="book-cover" src=${books[x].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
                     bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+1}" class="book-cover" src=${books[x+1].image.url} style="width: 23vw; height: calc(23vw * 1.5);">`;
                     bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+2}" class="book-cover" src=${books[x+2].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
+    }
+
+    setUseState(useState: UseState){
+        this.useState = useState;
+
     }
 
     async availabilityCheck(books: book[]) {
@@ -41,6 +47,10 @@ export class MainPage extends HTMLElement {
     }
 
    connectedCallback() {
+    this.render()
+  }
+
+  render() {
     if (this.shadowRoot) {
         this.shadowRoot.innerHTML = templateString;
         const searchBar = this.shadowRoot.querySelector("nextread-searchbar")?.shadowRoot?.getElementById("search-bar");
@@ -69,8 +79,7 @@ export class MainPage extends HTMLElement {
                         this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     
                         // check to see if books are available in SAPL catalogue and filter out the ones that aren't
-                        this.#books = await this.availabilityCheck(this.#books);//.catch((lookUpError) => console.log(lookUpError));
-                        console.log(this.#books);
+                        this.#books = await this.availabilityCheck(this.#books);
                         
                         this.fillBookCarousel(this.#books, bookSpace!, x);
                         if (bookSpace && bookSpace instanceof HTMLElement)
