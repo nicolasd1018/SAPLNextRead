@@ -12,7 +12,7 @@ import ErrorModal from '../components/ErrorModal';
 
 export class MainPage extends HTMLElement {
     #books: book[] = [];
-    useState: UseState = {whiteList:[], blackList:[]};
+    _useState: UseState = {whiteList:[], blackList:[]};
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -24,11 +24,6 @@ export class MainPage extends HTMLElement {
                     bookSpace!.innerHTML += x < 0 ? '<div style="width: 15vw; height: calc(15vw * 1.5);"></div>':`<img id="book-cover" data-book-index="${x}" class="book-cover" src=${books[x].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
                     bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+1}" class="book-cover" src=${books[x+1].image.url} style="width: 23vw; height: calc(23vw * 1.5);">`;
                     bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+2}" class="book-cover" src=${books[x+2].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
-    }
-
-    setUseState(useState: UseState){
-        this.useState = useState;
-
     }
 
     async availabilityCheck(books: book[]) {
@@ -46,9 +41,30 @@ export class MainPage extends HTMLElement {
         return books.filter((book)=> book.ageRating !== 'Error Retrieving Age');
     }
 
+    set useState(newState : UseState) {
+        this._useState = { ...this._useState, ...newState };
+        this.render();
+    }
+
+    get useState() {
+        return this._useState;
+    }
+
+    // 3. Example internal method that updates the lists
+    addToWhiteList(item: Tag) {
+        const updatedWhiteList = [...this._useState.whiteList, item];
+        this.useState = { whiteList: updatedWhiteList, blackList: this._useState.blackList }; // Uses the setter above
+    }
+
+    addToBlackList(item: Tag) {
+        const updatedBlackList = [...this._useState.blackList, item];
+        this.useState = { whiteList: this._useState.whiteList, blackList: updatedBlackList }; // Uses the setter above
+    }
+
+
    connectedCallback() {
-    this.render()
-  }
+        this.render()
+    }
 
   render() {
     if (this.shadowRoot) {
@@ -73,7 +89,7 @@ export class MainPage extends HTMLElement {
                     x = -1;
                     // get book recommendations from Hardcover
                     loadingScreen!.style.display = 'flex';
-                    this.#books = await getRecommendations(searchBar.value);
+                    this.#books = await getRecommendations(searchBar.value, this._useState.whiteList, this._useState.blackList);
                     // filter out all the duplicates
                     if (this.#books.length > 0) {
                         this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
@@ -115,7 +131,7 @@ export class MainPage extends HTMLElement {
                 if (x >= this.#books.length -3){
                     iteration += 1;
                     loadingScreen!.style.display = 'flex';
-                    let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value, iteration);
+                    let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value, this._useState.whiteList, this._useState.blackList, iteration);
                     newBooks = [...new Set(newBooks.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     newBooks = await this.availabilityCheck(newBooks);
                     this.#books = [...this.#books, ...newBooks];

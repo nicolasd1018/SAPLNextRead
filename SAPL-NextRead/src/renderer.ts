@@ -31,6 +31,8 @@ import './Pages/MainPage'
 import './Pages/BookPage'
 import './components/Header'
 import { book } from './API/HardcoverAPI';
+import { MainPage } from './Pages/MainPage';
+import { USBDevice } from 'electron';
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
@@ -63,8 +65,8 @@ export const changePage = (book: book | undefined = undefined) => {
   }
 }
 
-export const setGenreFilter = () => {
-  
+export const setUseState = (useState: UseState) => {
+  (mainPage as MainPage).useState = useState;
 }
 
 
