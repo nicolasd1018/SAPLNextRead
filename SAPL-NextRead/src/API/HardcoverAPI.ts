@@ -1,6 +1,7 @@
 import { ApolloClient, HttpLink, InMemoryCache, gql } from "@apollo/client";
 import { SetContextLink } from "@apollo/client/link/context";
 import { re } from "mathjs";
+import Tag from "../Types/Tag";
 
 const authLink = new SetContextLink(({ headers }) => {
   return {

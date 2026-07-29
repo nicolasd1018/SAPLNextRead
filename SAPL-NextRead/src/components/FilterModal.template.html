@@ -18,6 +18,8 @@
         flex-direction: column;
         width: 401.99px;
         gap: 15px;
+        align-items: center;
+        padding: 0px 0px 10px 0px;
     }
     #close-button{
         background-color: #602983;
@@ -56,6 +58,15 @@
         color: #602983;
         border-bottom: 2px solid #602983; 
     }
+    #save-button {
+        display: flex;
+        background-color: #602983;
+        color: white;
+        width: fit-content;
+    }
+    #save-button:hover {
+        cursor: pointer;
+    }
 </style>
 
 <div id="modal-background" >
@@ -68,5 +79,6 @@
             <div id="close-button">x</div>
         </div>
         <tag-menu tag-type="genre"></tag-menu>
+        <button id="save-button">Save</button>
     </div>
 </div>

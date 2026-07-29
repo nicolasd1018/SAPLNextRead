@@ -1,5 +1,7 @@
 import { getAllContentWarnings, getAllGenres, getAllMoods } from '../API/HardcoverAPI';
 import templateString from '../components/TagMenu.template.html?raw'
+import { setUseState } from '../renderer';
+import Tag from '../Types/Tag';
 
 class TagMenu extends HTMLElement {
     constructor() {
@@ -11,14 +13,16 @@ class TagMenu extends HTMLElement {
         return ["tag-type"];
     }
 
-    private whiteListTags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
-    private blackListTags:  Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
+    whiteListTags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
+    blackListTags:  Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
     tagType: string = 'genre';
     tagIndexes= new Map([['genre', 0], ['mood', 0], ['content-warning',0]]);
     tags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
 
+
     createTags(tags: string[]) {
         if (this.shadowRoot) {
+            console.log('3', this.whiteListTags);
             const whiteList = this.shadowRoot.getElementById('white-list');
             const blackList = this.shadowRoot.getElementById('black-list');
             whiteList!.innerHTML = '';
@@ -36,10 +40,13 @@ class TagMenu extends HTMLElement {
                     whiteGenreTag.innerText = tag;
                     whiteGenreTag.addEventListener('click', ()=>{
                         whiteGenreTag.classList.toggle('selected');
-                        if (this.whiteListTags.get(this.tagType)!.includes(tag)) 
+                        if (this.whiteListTags.get(this.tagType)!.includes(tag)) {
                             this.whiteListTags.set(this.tagType, this.whiteListTags.get(this.tagType)!.filter((bTag) => bTag !== tag));
-                        else
+                        }
+                        else {
                             this.whiteListTags.set(this.tagType, [...this.whiteListTags.get(this.tagType)!, tag]);
+                        }
+                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0]}}));
                     });
                     
                     const blackGenreTag = document.createElement('div');
@@ -51,11 +58,14 @@ class TagMenu extends HTMLElement {
                     }
                     blackGenreTag.addEventListener('click', ()=>{
                         blackGenreTag.classList.toggle('selected');
-                        if (this.blackListTags.get(this.tagType)!.includes(tag)) 
+                        if (this.blackListTags.get(this.tagType)!.includes(tag)) {
                             this.blackListTags.set(this.tagType,this.blackListTags.get(this.tagType)!.filter((bTag) => bTag !== tag));
-                        else
+                        }
+                        else {
                             this.blackListTags.set(this.tagType,[...this.whiteListTags.get(this.tagType)!, tag]);
-                        
+                            setUseState({whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0]},);
+                        }
+                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0]}}));
                     });
                     
                     whiteList.appendChild(whiteGenreTag);

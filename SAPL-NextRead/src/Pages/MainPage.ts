@@ -6,6 +6,8 @@ import '../components/LoadingScreen';
 import '../components/FilterModal';
 import '../components/ErrorModal'
 import ErrorModal from '../components/ErrorModal';
+import Tag from '../Types/Tag';
+import FilterModal from '../components/FilterModal';
 
 
 
@@ -44,6 +46,7 @@ export class MainPage extends HTMLElement {
     set useState(newState : UseState) {
         this._useState = { ...this._useState, ...newState };
         this.render();
+        console.log('1', this.useState);
     }
 
     get useState() {
@@ -186,6 +189,7 @@ export class MainPage extends HTMLElement {
                     filterModal.style.display = 'flex';
                 }
             });
+            (filterModal as FilterModal).useState = this.useState;
         }
     }
   }
