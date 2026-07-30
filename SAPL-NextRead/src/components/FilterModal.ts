@@ -10,6 +10,11 @@ export default class FilterModal extends HTMLElement{
         this.attachShadow({ mode: 'open' });
     }
 
+    async setUseState( useState: UseState) {
+        this.useState = useState;
+        await this.render();
+    }
+
     async connectedCallback() {
         await this.render();
     }
@@ -63,13 +68,13 @@ export default class FilterModal extends HTMLElement{
                     this.useState ={whiteList: (event as CustomEvent).detail.whiteList, blackList:(event as CustomEvent).detail.blackList};
                 });
                 console.log('2',this.useState);
-                (tagSpace as TagMenu).whiteListTags.set('genre', this.useState.whiteList.filter((tag)=> tag.type === 'genre'));
-                (tagSpace as TagMenu).whiteListTags.set('mood', this.useState.whiteList.filter((tag)=> tag.type === 'mood'));
-                (tagSpace as TagMenu).whiteListTags.set('content-warning', this.useState.whiteList.filter((tag)=> tag.type === 'content-warning'));
+                (tagSpace as TagMenu).setWhiteList('genre', this.useState.whiteList.filter((tag)=> tag.type === 'genre').map((tag)=> tag.name));
+                (tagSpace as TagMenu).setWhiteList('mood', this.useState.whiteList.filter((tag)=> tag.type === 'mood').map((tag)=> tag.name));
+                (tagSpace as TagMenu).setWhiteList('content-warning', this.useState.whiteList.filter((tag)=> tag.type === 'content-warning').map((tag)=> tag.name));
 
-                (tagSpace as TagMenu).blackListTags.set('genre', this.useState.blackList.filter((tag)=> tag.type === 'genre'));
-                (tagSpace as TagMenu).blackListTags.set('mood', this.useState.blackList.filter((tag)=> tag.type === 'mood'));
-                (tagSpace as TagMenu).blackListTags.set('content-warning', this.useState.blackList.filter((tag)=> tag.type === 'content-warning'));
+                (tagSpace as TagMenu).setBlackList('genre', this.useState.blackList.filter((tag)=> tag.type === 'genre').map((tag)=> tag.name));
+                (tagSpace as TagMenu).setBlackList('mood', this.useState.blackList.filter((tag)=> tag.type === 'mood').map((tag)=> tag.name));
+                (tagSpace as TagMenu).setBlackList('content-warning', this.useState.blackList.filter((tag)=> tag.type === 'content-warning').map((tag)=> tag.name));
 
                 await (tagSpace as TagMenu).render();
             }

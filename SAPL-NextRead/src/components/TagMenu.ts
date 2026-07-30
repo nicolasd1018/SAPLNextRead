@@ -1,3 +1,4 @@
+import { first } from 'rxjs';
 import { getAllContentWarnings, getAllGenres, getAllMoods } from '../API/HardcoverAPI';
 import templateString from '../components/TagMenu.template.html?raw'
 import { setUseState } from '../renderer';
@@ -11,6 +12,16 @@ class TagMenu extends HTMLElement {
 
     static get observedAttributes() {
         return ["tag-type"];
+    }
+
+    setWhiteList(type: string, tags: string[]) {
+        this.whiteListTags.set(type, tags);
+        this.render();
+    }
+
+    setBlackList(type: string, tags: string[]) {
+        this.blackListTags.set(type, tags);
+        this.render();
     }
 
     whiteListTags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
@@ -34,7 +45,11 @@ class TagMenu extends HTMLElement {
                     const whiteGenreTag = document.createElement('div');
                     whiteGenreTag.id = `genre-tag-${index}`;
                     whiteGenreTag.className = 'tag';
+                    console.log(`|${tag}|`, this.tagType);
+                    const firstTag = this.whiteListTags.get(this.tagType)?.[0];
+                    console.log(`|${firstTag? typeof firstTag: ''}|`);
                     if (this.whiteListTags.get(this.tagType)!.includes(tag)) {
+                        console.log('test');
                         whiteGenreTag.classList.toggle('selected');
                     }
                     whiteGenreTag.innerText = tag;
@@ -63,7 +78,6 @@ class TagMenu extends HTMLElement {
                         }
                         else {
                             this.blackListTags.set(this.tagType,[...this.whiteListTags.get(this.tagType)!, tag]);
-                            setUseState({whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0]},);
                         }
                         this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0]}}));
                     });

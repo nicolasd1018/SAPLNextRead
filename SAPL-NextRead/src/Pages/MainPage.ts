@@ -69,6 +69,10 @@ export class MainPage extends HTMLElement {
         this.render()
     }
 
+    filterBooks () {
+        this.#books = this.#books.filter((book)=> book.genres.some((genre)=>this.useState.whiteList.map((tag)=> tag.name).includes(genre)));
+    }
+
   render() {
     if (this.shadowRoot) {
         this.shadowRoot.innerHTML = templateString;
@@ -92,13 +96,15 @@ export class MainPage extends HTMLElement {
                     x = -1;
                     // get book recommendations from Hardcover
                     loadingScreen!.style.display = 'flex';
-                    this.#books = await getRecommendations(searchBar.value, this._useState.whiteList, this._useState.blackList);
+                    this.#books = await getRecommendations(searchBar.value);
                     // filter out all the duplicates
                     if (this.#books.length > 0) {
                         this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     
                         // check to see if books are available in SAPL catalogue and filter out the ones that aren't
                         this.#books = await this.availabilityCheck(this.#books);
+
+                        this.filterBooks();
                         
                         this.fillBookCarousel(this.#books, bookSpace!, x);
                         if (bookSpace && bookSpace instanceof HTMLElement)
@@ -134,7 +140,7 @@ export class MainPage extends HTMLElement {
                 if (x >= this.#books.length -3){
                     iteration += 1;
                     loadingScreen!.style.display = 'flex';
-                    let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value, this._useState.whiteList, this._useState.blackList, iteration);
+                    let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value, iteration);
                     newBooks = [...new Set(newBooks.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     newBooks = await this.availabilityCheck(newBooks);
                     this.#books = [...this.#books, ...newBooks];
@@ -189,7 +195,8 @@ export class MainPage extends HTMLElement {
                     filterModal.style.display = 'flex';
                 }
             });
-            (filterModal as FilterModal).useState = this.useState;
+            (filterModal as FilterModal).setUseState(this.useState);
+            console.log('1.5', (filterModal as FilterModal).useState);
         }
     }
   }

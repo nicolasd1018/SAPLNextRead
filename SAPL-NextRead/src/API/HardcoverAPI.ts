@@ -34,19 +34,8 @@ export interface book {
     ageRating: string
 }
 // const client = ...
-export const getRecommendations = async (title: string, whiteList: Tag[], blackList: Tag[], iteration?: number): Promise<book[]>=> {
+export const getRecommendations = async (title: string, iteration?: number): Promise<book[]>=> {
     var reccomendation: book[] =  [];
-    var filterString = '';
-    if (whiteList.length !== 0) {
-        whiteList.forEach((tag)=> {
-            filterString += `, {book: {taggings: {tag: {tag: {_eq: "${tag.name}"}}}}}`
-        })
-    }
-    if (blackList.length !== 0) {
-        blackList.forEach((tag)=> {
-            filterString += `, {book: {taggings: {tag: {tag: {_neq: "${tag.name}"}}}}}`
-        })
-    }
     await client
     .query({
         query: gql`
@@ -95,7 +84,7 @@ export const getRecommendations = async (title: string, whiteList: Tag[], blackL
                 user_books (where: {rating: {_gte: 4}}
                             ${iteration ? `offset: ${10* iteration}` : ''} limit: 10){
                 user{
-                    user_books (where:{_and: [{rating: {_gte: 4}}, {book: {title: {_neq: "${title}"}}}${filterString}]}
+                    user_books (where:{_and: [{rating: {_gte: 4}}, {book: {title: {_neq: "${title}"}}}]}
                                 order_by: {rating: desc}
       
                                  limit: 5){
