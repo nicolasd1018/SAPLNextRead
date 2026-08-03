@@ -21,11 +21,13 @@ export class MainPage extends HTMLElement {
     }
 
     fillBookCarousel(books: book[], bookSpace: HTMLElement, x: number) {
-        bookSpace!.innerHTML = ''
-                    
-                    bookSpace!.innerHTML += x < 0 ? '<div style="width: 15vw; height: calc(15vw * 1.5);"></div>':`<img id="book-cover" data-book-index="${x}" class="book-cover" src=${books[x].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
-                    bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+1}" class="book-cover" src=${books[x+1].image.url} style="width: 23vw; height: calc(23vw * 1.5);">`;
-                    bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+2}" class="book-cover" src=${books[x+2].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
+
+        try {
+            bookSpace!.innerHTML = ''
+            bookSpace!.innerHTML += x < 0 ? '<div style="width: 15vw; height: calc(15vw * 1.5);"></div>':`<img id="book-cover" data-book-index="${x}" class="book-cover" src=${books[x].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
+            bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+1}" class="book-cover" src=${books[x+1].image.url} style="width: 23vw; height: calc(23vw * 1.5);">`;
+            bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+2}" class="book-cover" src=${books[x+2].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
+        } catch {}
     }
 
     async availabilityCheck(books: book[]) {
@@ -33,20 +35,18 @@ export class MainPage extends HTMLElement {
                         books.map(async (book) => {
                             const usableSubtitle = book.title.includes(book.subtitle) ? book.subtitle : '';
                             const age = await window.electronAPI.runAgeFinder(book.title.replace(book.subtitle, '').replace(usableSubtitle, '').replaceAll('%', '%25').replaceAll(' ', '%20'), usableSubtitle );
-                            console.log(age);
                             return {index: book.id, age: age[0] };
                         })
                     );
         // books.forEach((book)=> console.log(book.title, book.ageRating));
         console.log(asyncResults);
-        books.forEach((book) => {console.log(book.id);book.ageRating = asyncResults.find((result)=> result.index === book.id)!.age!;} )
+        books.forEach((book) => {book.ageRating = asyncResults.find((result)=> result.index === book.id)!.age!;} )
         return books.filter((book)=> book.ageRating !== 'Error Retrieving Age');
     }
 
     set useState(newState : UseState) {
         this._useState = { ...this._useState, ...newState };
         this.render();
-        console.log('1', this.useState);
     }
 
     get useState() {
@@ -70,7 +70,15 @@ export class MainPage extends HTMLElement {
     }
 
     filterBooks () {
-        this.#books = this.#books.filter((book)=> book.genres.some((genre)=>this.useState.whiteList.map((tag)=> tag.name).includes(genre)));
+        console.log(this.useState.whiteList);
+        this.#books = this.#books.filter((book)=>book.genres.some((genre)=> {console.log(this.useState.whiteList.map((tag)=> tag.name).includes(genre.tag.tag), genre.tag.tag);return this.useState.whiteList.map((tag)=> tag.name).includes(genre.tag.tag);}));
+        // this.#books = this.#books.forEach((book).)
+        // this.#books = this.#books.filter((book)=> book.moods.some((mood)=>this.useState.whiteList.map((tag)=> tag.name).includes(mood)));
+        // this.#books = this.#books.filter((book)=> book.contentWarnings.some((contentWarning)=>this.useState.whiteList.map((tag)=> tag.name).includes(contentWarning)));
+
+        // this.#books = this.#books.filter((book)=> !book.genres.some((genre)=>this.useState.blackList.map((tag)=> tag.name).includes(genre)));
+        // this.#books = this.#books.filter((book)=> !book.moods.some((mood)=>this.useState.blackList.map((tag)=> tag.name).includes(mood)));
+        // this.#books = this.#books.filter((book)=> !book.contentWarnings.some((contentWarning)=>this.useState.blackList.map((tag)=> tag.name).includes(contentWarning)));
     }
 
   render() {
@@ -105,6 +113,7 @@ export class MainPage extends HTMLElement {
                         this.#books = await this.availabilityCheck(this.#books);
 
                         this.filterBooks();
+                        console.log(this.#books);
                         
                         this.fillBookCarousel(this.#books, bookSpace!, x);
                         if (bookSpace && bookSpace instanceof HTMLElement)

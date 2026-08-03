@@ -33,7 +33,6 @@ class TagMenu extends HTMLElement {
 
     createTags(tags: string[]) {
         if (this.shadowRoot) {
-            console.log('3', this.whiteListTags);
             const whiteList = this.shadowRoot.getElementById('white-list');
             const blackList = this.shadowRoot.getElementById('black-list');
             whiteList!.innerHTML = '';
@@ -45,9 +44,7 @@ class TagMenu extends HTMLElement {
                     const whiteGenreTag = document.createElement('div');
                     whiteGenreTag.id = `genre-tag-${index}`;
                     whiteGenreTag.className = 'tag';
-                    console.log(`|${tag}|`, this.tagType);
                     const firstTag = this.whiteListTags.get(this.tagType)?.[0];
-                    console.log(`|${firstTag? typeof firstTag: ''}|`);
                     if (this.whiteListTags.get(this.tagType)!.includes(tag)) {
                         console.log('test');
                         whiteGenreTag.classList.toggle('selected');
