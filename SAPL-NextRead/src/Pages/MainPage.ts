@@ -70,15 +70,19 @@ export class MainPage extends HTMLElement {
     }
 
     filterBooks () {
-        console.log(this.useState.whiteList);
-        this.#books = this.#books.filter((book)=>book.genres.some((genre)=> {console.log(this.useState.whiteList.map((tag)=> tag.name).includes(genre.tag.tag), genre.tag.tag);return this.useState.whiteList.map((tag)=> tag.name).includes(genre.tag.tag);}));
-        // this.#books = this.#books.forEach((book).)
-        // this.#books = this.#books.filter((book)=> book.moods.some((mood)=>this.useState.whiteList.map((tag)=> tag.name).includes(mood)));
-        // this.#books = this.#books.filter((book)=> book.contentWarnings.some((contentWarning)=>this.useState.whiteList.map((tag)=> tag.name).includes(contentWarning)));
+        if (this.useState.whiteList.filter((tag) => tag.type === 'genre').length !== 0) 
+            this.#books = this.#books.filter((book)=>book.genres.some((genre)=> {return this.useState.whiteList.map((tag)=> tag.name).includes(genre.tag.tag);}));
+        if (this.useState.whiteList.filter((tag) => tag.type === 'mood').length !== 0) 
+            this.#books = this.#books.filter((book)=>book.moods.some((mood)=> {return this.useState.whiteList.map((tag)=> tag.name).includes(mood.tag.tag);}));
+        if (this.useState.whiteList.filter((tag) => tag.type === 'content-warning').length !== 0) 
+            this.#books = this.#books.filter((book)=>book.contentWarnings.some((contentWarning)=> {return this.useState.whiteList.map((tag)=> tag.name).includes(contentWarning.tag.tag);}));
 
-        // this.#books = this.#books.filter((book)=> !book.genres.some((genre)=>this.useState.blackList.map((tag)=> tag.name).includes(genre)));
-        // this.#books = this.#books.filter((book)=> !book.moods.some((mood)=>this.useState.blackList.map((tag)=> tag.name).includes(mood)));
-        // this.#books = this.#books.filter((book)=> !book.contentWarnings.some((contentWarning)=>this.useState.blackList.map((tag)=> tag.name).includes(contentWarning)));
+        if (this.useState.blackList.filter((tag) => tag.type === 'genre').length !== 0) 
+            this.#books = this.#books.filter((book)=>book.genres.every((genre)=> {console.log(this.useState.blackList.map((tag)=> tag.name), genre.tag.tag, this.useState.blackList.map((tag)=> tag.name).includes(genre.tag.tag));return !this.useState.blackList.map((tag)=> tag.name).includes(genre.tag.tag);}));
+        if (this.useState.blackList.filter((tag) => tag.type === 'mood').length !== 0)  
+            this.#books = this.#books.filter((book)=>book.moods.every((mood)=> {return !this.useState.blackList.map((tag)=> tag.name).includes(mood.tag.tag);}));
+        if (this.useState.blackList.filter((tag) => tag.type === 'content-warning').length !== 0) 
+            this.#books = this.#books.filter((book)=>book.contentWarnings.every((contentWarning)=> {return !this.useState.blackList.map((tag)=> tag.name).includes(contentWarning.tag.tag);}));
     }
 
   render() {
@@ -113,7 +117,6 @@ export class MainPage extends HTMLElement {
                         this.#books = await this.availabilityCheck(this.#books);
 
                         this.filterBooks();
-                        console.log(this.#books);
                         
                         this.fillBookCarousel(this.#books, bookSpace!, x);
                         if (bookSpace && bookSpace instanceof HTMLElement)
@@ -154,6 +157,7 @@ export class MainPage extends HTMLElement {
                     newBooks = await this.availabilityCheck(newBooks);
                     this.#books = [...this.#books, ...newBooks];
                     this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
+                    this.filterBooks();
                 }
                 this.fillBookCarousel(this.#books, bookSpace!, x);
                 loadingScreen!.style.display = 'none';
