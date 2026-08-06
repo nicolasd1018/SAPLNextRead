@@ -8,13 +8,14 @@ import '../components/ErrorModal'
 import ErrorModal from '../components/ErrorModal';
 import Tag from '../Types/Tag';
 import FilterModal from '../components/FilterModal';
+import UseState from '../Types/UseState';
 
 
 
 
 export class MainPage extends HTMLElement {
     #books: book[] = [];
-    _useState: UseState = {whiteList:[], blackList:[]};
+    _useState: UseState = {whiteList:[], blackList:[], ageRange: ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult']};
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -56,12 +57,12 @@ export class MainPage extends HTMLElement {
     // 3. Example internal method that updates the lists
     addToWhiteList(item: Tag) {
         const updatedWhiteList = [...this._useState.whiteList, item];
-        this.useState = { whiteList: updatedWhiteList, blackList: this._useState.blackList }; // Uses the setter above
+        this.useState = { whiteList: updatedWhiteList, blackList: this._useState.blackList, ageRange: this._useState.ageRange }; // Uses the setter above
     }
 
     addToBlackList(item: Tag) {
         const updatedBlackList = [...this._useState.blackList, item];
-        this.useState = { whiteList: this._useState.whiteList, blackList: updatedBlackList }; // Uses the setter above
+        this.useState = { whiteList: this._useState.whiteList, blackList: updatedBlackList, ageRange: this._useState.ageRange }; // Uses the setter above
     }
 
 
@@ -99,7 +100,7 @@ export class MainPage extends HTMLElement {
         let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');;
         let x = -1;
         let iteration = 0;
-        
+        console.log(this.useState);
 
         if (searchBar && searchBar instanceof HTMLInputElement) {
             searchBar.addEventListener("keydown", async (event) => {

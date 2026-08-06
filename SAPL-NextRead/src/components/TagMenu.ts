@@ -78,7 +78,25 @@ class TagMenu extends HTMLElement {
     tagType: string = 'genre';
     tagIndexes= new Map([['genre', 0], ['mood', 0], ['content-warning',0]]);
     tags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
+    ages = ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'];
 
+    get ageRangeMax(): number {
+        if (this.shadowRoot) {
+            const maxValue = (this.shadowRoot.getElementById('to-slider') as HTMLInputElement)?.value;
+            if (maxValue)
+                return parseInt(maxValue)+1;
+        }
+        return 0;
+    }
+
+    get ageRangeMin(): number {
+        if (this.shadowRoot) {
+            const maxValue = (this.shadowRoot.getElementById('from-sider') as HTMLInputElement)?.value;
+            if (maxValue)
+                return parseInt(maxValue);
+        }
+        return 0;
+    }
 
     createTags(tags: string[]) {
         if (this.shadowRoot) {
@@ -108,7 +126,7 @@ class TagMenu extends HTMLElement {
                         else {
                             this.whiteListTags.set(this.tagType, [...this.whiteListTags.get(this.tagType)!, tag]);
                         }
-                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0]}}));
+                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages}}));
                     });
                     
                     const blackGenreTag = document.createElement('div');
@@ -126,7 +144,7 @@ class TagMenu extends HTMLElement {
                         else {
                             this.blackListTags.set(this.tagType,[...this.whiteListTags.get(this.tagType)!, tag]);
                         }
-                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0]}}));
+                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax)}}));
                     });
                     
                     whiteList.appendChild(whiteGenreTag);
@@ -231,6 +249,11 @@ class TagMenu extends HTMLElement {
 
                 fromSlider!.oninput = () => this.controlFromSlider(fromSlider, toSlider);
                 toSlider!.oninput = () => this.controlToSlider(fromSlider, toSlider);
+
+                fromSlider.addEventListener('input', ()=>{
+                    
+                    this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages}}))
+                })
             }
         }
     }

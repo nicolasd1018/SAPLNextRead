@@ -1,10 +1,12 @@
 import templateString from '../components/FilterModal.template.html?raw';
 import { setUseState } from '../renderer';
+import Tag from '../Types/Tag';
+import UseState from '../Types/UseState';
 import './TagMenu';
 import TagMenu from './TagMenu';
 export default class FilterModal extends HTMLElement{
     tab: string = 'genre';
-    useState: UseState = {whiteList: [], blackList: []};
+    useState: UseState = {whiteList: [], blackList: [], ageRange: ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult']};
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -65,7 +67,8 @@ export default class FilterModal extends HTMLElement{
 
             if (tagSpace) {
                 tagSpace.addEventListener('set-filter', (event)=>{
-                    this.useState ={whiteList: (event as CustomEvent).detail.whiteList, blackList:(event as CustomEvent).detail.blackList};
+                    
+                    this.useState ={whiteList: (event as CustomEvent).detail.whiteList, blackList:(event as CustomEvent).detail.blackList, ageRange: ages.slice((tagSpace as TagMenu).ageRangeMin,(tagSpace as TagMenu).ageRangeMax)};
                 });
                 (tagSpace as TagMenu).setWhiteList('genre', this.useState.whiteList.filter((tag)=> tag.type === 'genre').map((tag)=> tag.name));
                 (tagSpace as TagMenu).setWhiteList('mood', this.useState.whiteList.filter((tag)=> tag.type === 'mood').map((tag)=> tag.name));
