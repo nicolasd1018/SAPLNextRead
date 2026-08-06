@@ -33,6 +33,8 @@ import './components/Header'
 import { book } from './API/HardcoverAPI';
 import { MainPage } from './Pages/MainPage';
 import { USBDevice } from 'electron';
+import UseState from './Types/UseState';
+import BookPage from './Pages/BookPage';
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
@@ -56,6 +58,7 @@ export const changePage = (book: book | undefined = undefined) => {
     bookPage.setAttribute('moods', book.moods.map((genre)=> genre.tag.tag).toString());
     bookPage.setAttribute('contentWarnings', book.contentWarnings.map((genre)=> genre.tag.tag).toString());
     bookPage.setAttribute('ageRating', book.ageRating);
+    (bookPage as BookPage).bookSeries = book.book_series;
 
     document.body.append(bookPage);
   }

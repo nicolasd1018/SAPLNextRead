@@ -67,8 +67,8 @@ export default class FilterModal extends HTMLElement{
 
             if (tagSpace) {
                 tagSpace.addEventListener('set-filter', (event)=>{
-                    
-                    this.useState ={whiteList: (event as CustomEvent).detail.whiteList, blackList:(event as CustomEvent).detail.blackList, ageRange: ages.slice((tagSpace as TagMenu).ageRangeMin,(tagSpace as TagMenu).ageRangeMax)};
+                    console.log('test',(event as CustomEvent).detail.ageRange);
+                    this.useState ={whiteList: (event as CustomEvent).detail.whiteList, blackList:(event as CustomEvent).detail.blackList, ageRange: (event as CustomEvent).detail.ageRange};
                 });
                 (tagSpace as TagMenu).setWhiteList('genre', this.useState.whiteList.filter((tag)=> tag.type === 'genre').map((tag)=> tag.name));
                 (tagSpace as TagMenu).setWhiteList('mood', this.useState.whiteList.filter((tag)=> tag.type === 'mood').map((tag)=> tag.name));

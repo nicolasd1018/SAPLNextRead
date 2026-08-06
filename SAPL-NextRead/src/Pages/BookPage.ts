@@ -1,6 +1,15 @@
 import templateString from '../Pages/BookPage.template.html?raw';
 
 class BookPage extends HTMLElement {
+    private _bookSeries:{position: number, series: {name: string, books_count: number}}[] = [];
+
+    get bookSeries(): {position: number, series: {name: string, books_count: number}}[] {
+        return this._bookSeries;
+    }
+
+    set bookSeries(bookSeries: {position: number, series: {name: string, books_count: number}}[]) {
+        this._bookSeries = bookSeries;
+    }
 
     constructor() {
         super();
@@ -30,6 +39,8 @@ class BookPage extends HTMLElement {
             const moods = this.getAttribute('moods');
             const ageTag = this.shadowRoot.getElementById('age-rating');
             const ageRating = this.getAttribute('ageRating');
+            const seriesTracker = this.shadowRoot.getElementById('series-tracker');
+
 
             if (imgUrl && bookCover && bookCover instanceof HTMLImageElement){
                 bookCover.src = imgUrl;
@@ -94,6 +105,14 @@ class BookPage extends HTMLElement {
                 else if (ageRating === 'Adult') {
                     ageTag.title = 'Not written with children in mind'
                 }
+            }
+
+            if (seriesTracker && this.bookSeries.length > 0) {
+                this.bookSeries.forEach((series)=> {
+                    const seriesLine = document.createElement('div');
+                    seriesLine.textContent = `${series.position} of ${series.series.books_count} in ${series.series.name}`;
+                    seriesTracker.appendChild(seriesLine);
+                })
             }
         }
     }

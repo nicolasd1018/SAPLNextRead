@@ -28,6 +28,7 @@ export interface book {
     contributions: {author: {name:string}}[]
     description: string
     subtitle: string
+    book_series: {position: number, series: {name: string, books_count: number}}[]
     genres: {tag: {tag: string}}[]
     contentWarnings: {tag: {tag: string}}[]
     moods: {tag: {tag: string}}[]
@@ -52,6 +53,13 @@ export const getRecommendations = async (title: string, iteration?: number): Pro
         subtitle
         contributions{author{name}}
         description
+        book_series {
+            position
+            series {
+            name
+            books_count
+            }
+        }
         }
 
         fragment genres on books{

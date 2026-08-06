@@ -91,9 +91,9 @@ class TagMenu extends HTMLElement {
 
     get ageRangeMin(): number {
         if (this.shadowRoot) {
-            const maxValue = (this.shadowRoot.getElementById('from-sider') as HTMLInputElement)?.value;
-            if (maxValue)
-                return parseInt(maxValue);
+            const minValue = (this.shadowRoot.getElementById('from-slider') as HTMLInputElement)?.value;
+            if (minValue)
+                return parseInt(minValue);
         }
         return 0;
     }
@@ -251,9 +251,11 @@ class TagMenu extends HTMLElement {
                 toSlider!.oninput = () => this.controlToSlider(fromSlider, toSlider);
 
                 fromSlider.addEventListener('input', ()=>{
-                    
-                    this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages}}))
-                })
+                    this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax)}}))
+                });
+                toSlider.addEventListener('input', ()=>{
+                    this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax)}}))
+                });
             }
         }
     }

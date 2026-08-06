@@ -39,8 +39,6 @@ export class MainPage extends HTMLElement {
                             return {index: book.id, age: age[0] };
                         })
                     );
-        // books.forEach((book)=> console.log(book.title, book.ageRating));
-        console.log(asyncResults);
         books.forEach((book) => {book.ageRating = asyncResults.find((result)=> result.index === book.id)!.age!;} )
         return books.filter((book)=> book.ageRating !== 'Error Retrieving Age');
     }
@@ -84,6 +82,7 @@ export class MainPage extends HTMLElement {
             this.#books = this.#books.filter((book)=>book.moods.every((mood)=> {return !this.useState.blackList.map((tag)=> tag.name).includes(mood.tag.tag);}));
         if (this.useState.blackList.filter((tag) => tag.type === 'content-warning').length !== 0) 
             this.#books = this.#books.filter((book)=>book.contentWarnings.every((contentWarning)=> {return !this.useState.blackList.map((tag)=> tag.name).includes(contentWarning.tag.tag);}));
+        this.#books = this.#books.filter((book) => this.useState.ageRange.includes(book.ageRating));
     }
 
   render() {
@@ -119,6 +118,7 @@ export class MainPage extends HTMLElement {
 
                         this.filterBooks();
                         
+                        console.log(this.#books);
                         this.fillBookCarousel(this.#books, bookSpace!, x);
                         if (bookSpace && bookSpace instanceof HTMLElement)
                         {
