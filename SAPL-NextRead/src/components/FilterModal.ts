@@ -67,7 +67,6 @@ export default class FilterModal extends HTMLElement{
                 tagSpace.addEventListener('set-filter', (event)=>{
                     this.useState ={whiteList: (event as CustomEvent).detail.whiteList, blackList:(event as CustomEvent).detail.blackList};
                 });
-                console.log('2',this.useState);
                 (tagSpace as TagMenu).setWhiteList('genre', this.useState.whiteList.filter((tag)=> tag.type === 'genre').map((tag)=> tag.name));
                 (tagSpace as TagMenu).setWhiteList('mood', this.useState.whiteList.filter((tag)=> tag.type === 'mood').map((tag)=> tag.name));
                 (tagSpace as TagMenu).setWhiteList('content-warning', this.useState.whiteList.filter((tag)=> tag.type === 'content-warning').map((tag)=> tag.name));

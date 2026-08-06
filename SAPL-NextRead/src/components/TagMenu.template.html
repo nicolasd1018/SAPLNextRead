@@ -34,23 +34,104 @@
         display: flex;
         gap: 10px;
     }
+    #misc-space{
+        display: none;
+        
+    }
+    datalist {
+        display: flex;
+        flex-direction: column;
+        writing-mode: vertical-lr;
+        width: 200px;
+        padding-left: 2px;
+        gap: 27px;
+    }
+    option {
+        padding: 0;
+    }
+   #age-range-slider {
+        display: flex;
+        flex-direction: column;
+        width: 200px;
+        position: relative;
+        min-height: 30px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        pointer-events: all;
+        width: 15px;
+        height: 15px;
+        background-color: #602983;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-top: -17.5px; 
+    }
+    input[type=range]::-moz-range-thumb {
+        -webkit-appearance: none;
+        pointer-events: all;
+        width: 15px;
+        height: 15px;
+        background-color: #602983;
+        border-radius: 50%;
+        cursor: pointer;  
+    }
+    input[type="range"] {
+        -webkit-appearance: none; 
+        appearance: none;
+        height: 2px;
+        width: 200px;
+        position: absolute;
+        pointer-events: none;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    #from-slider { 
+        z-index: 2; /* Increased z-index to sit cleanly on top */
+        background: transparent; /* Hides top track line so it doesn't double-layer */
+    }
+    #to-slider {
+        z-index: 1;
+    }
+        input[type=range]::-webkit-slider-thumb { 
+        pointer-events: all; 
+    } 
+    input[type=range]::-moz-range-thumb { 
+        pointer-events: all; 
+    }
+
 </style>
 
 <div id="tag-space">
-
-    <div id="search-holder">
-        <div>Search</div>
-        <input type="search" id="search-bar"></input>
+    <div id="tag-holder">
+        <div id="search-holder">
+            <div>Search</div>
+            <input type="search" id="search-bar"></input>
+        </div>
+        <div id="white-list-label" class="label">
+            White List
+        </div>
+        <div id="white-list" class="tag-space">
+        </div>
+        <div id="black-list-lable" class="label">
+            Black List
+        </div>
+        <div id="black-list" class="tag-space">
+        </div>
     </div>
-    <div id="white-list-label" class="label">
-        White List
-    </div>
-    <div id="white-list" class="tag-space">
-    </div>
-    <div id="black-list-lable" class="label">
-        Black List
-    </div>
-    <div id="black-list" class="tag-space">
-        
+    <div id="misc-space">
+        <label for="age-range-slider">Age Range</label>
+        <section id="age-range-slider" class="range-slider">
+            
+            <span class="rangeValues"></span>
+            <input id="from-slider" value="0" min="0" max="4" step="1" type="range" list="markers">
+            <input id="to-slider" value="0" min="0" max="4" step="1" type="range" list="markers">
+        </section>
+        <datalist id="markers">
+            <option value="0" label="- Toddler" ></option>
+            <option value="1" label="- Juvenile Beginner" ></option>
+            <option value="2" label="- Juvenile"></option>
+            <option value="3" label="- Young Adult"></option>
+            <option value="4" label="- Adult"></option>
+        </datalist>
     </div>
 </div>
