@@ -6,7 +6,7 @@ import './TagMenu';
 import TagMenu from './TagMenu';
 export default class FilterModal extends HTMLElement{
     tab: string = 'genre';
-    useState: UseState = {whiteList: [], blackList: [], ageRange: ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult']};
+    useState: UseState = {whiteList: [], blackList: [], ageRange: ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'], bipocFilter: false, lgbtqFilter: false};
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -67,8 +67,7 @@ export default class FilterModal extends HTMLElement{
 
             if (tagSpace) {
                 tagSpace.addEventListener('set-filter', (event)=>{
-                    console.log('test',(event as CustomEvent).detail.ageRange);
-                    this.useState ={whiteList: (event as CustomEvent).detail.whiteList, blackList:(event as CustomEvent).detail.blackList, ageRange: (event as CustomEvent).detail.ageRange};
+                    this.useState ={whiteList: (event as CustomEvent).detail.whiteList, blackList:(event as CustomEvent).detail.blackList, ageRange: (event as CustomEvent).detail.ageRange, bipocFilter: (event as CustomEvent).detail.bipocFilter, lgbtqFilter: (event as CustomEvent).detail.lgbtqFilter};
                 });
                 (tagSpace as TagMenu).setWhiteList('genre', this.useState.whiteList.filter((tag)=> tag.type === 'genre').map((tag)=> tag.name));
                 (tagSpace as TagMenu).setWhiteList('mood', this.useState.whiteList.filter((tag)=> tag.type === 'mood').map((tag)=> tag.name));
@@ -78,7 +77,12 @@ export default class FilterModal extends HTMLElement{
                 (tagSpace as TagMenu).setBlackList('mood', this.useState.blackList.filter((tag)=> tag.type === 'mood').map((tag)=> tag.name));
                 (tagSpace as TagMenu).setBlackList('content-warning', this.useState.blackList.filter((tag)=> tag.type === 'content-warning').map((tag)=> tag.name));
 
-                await (tagSpace as TagMenu).render();
+                const ages = ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'];
+                console.log(ages.findIndex((age)=> age=== this.useState.ageRange[0]));
+                (tagSpace as TagMenu).initialMin = ages.findIndex((age)=> age=== this.useState.ageRange[0]);
+                (tagSpace as TagMenu).initialMax = ages.findIndex((age)=> age=== this.useState.ageRange.at(-1));
+
+                (tagSpace as TagMenu).render();
             }
 
             if (saveButton) {

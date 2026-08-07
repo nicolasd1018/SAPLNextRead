@@ -79,6 +79,8 @@ class TagMenu extends HTMLElement {
     tagIndexes= new Map([['genre', 0], ['mood', 0], ['content-warning',0]]);
     tags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
     ages = ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'];
+    initialMin = 0
+    initialMax = 4;
 
     get ageRangeMax(): number {
         if (this.shadowRoot) {
@@ -96,6 +98,21 @@ class TagMenu extends HTMLElement {
                 return parseInt(minValue);
         }
         return 0;
+    }
+
+
+    get bipocFilter(): boolean {
+        const bipocFilter = (this.shadowRoot?.getElementById('bipoc-filter') as HTMLInputElement)?.checked;
+        if (bipocFilter) 
+            return bipocFilter;
+        return false;
+    }
+
+    get lgbtqFilter(): boolean {
+        const lgbtqFilter = (this.shadowRoot?.getElementById('lgbtq-filter') as HTMLInputElement)?.checked;
+        if (lgbtqFilter) 
+            return lgbtqFilter;
+        return false;
     }
 
     createTags(tags: string[]) {
@@ -126,7 +143,7 @@ class TagMenu extends HTMLElement {
                         else {
                             this.whiteListTags.set(this.tagType, [...this.whiteListTags.get(this.tagType)!, tag]);
                         }
-                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages}}));
+                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));
                     });
                     
                     const blackGenreTag = document.createElement('div');
@@ -144,7 +161,7 @@ class TagMenu extends HTMLElement {
                         else {
                             this.blackListTags.set(this.tagType,[...this.whiteListTags.get(this.tagType)!, tag]);
                         }
-                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax)}}));
+                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));
                     });
                     
                     whiteList.appendChild(whiteGenreTag);
@@ -240,10 +257,18 @@ class TagMenu extends HTMLElement {
             }
             else if (tagHolder && miscSpace) {
                 tagHolder.style.display = 'none';
-                miscSpace.style.display = 'block';
+                miscSpace.style.display = 'flex';
 
                 const fromSlider = this.shadowRoot.querySelector('#from-slider') as HTMLInputElement;
                 const toSlider = this.shadowRoot.querySelector('#to-slider') as HTMLInputElement;
+                const lgbtqBox = this.shadowRoot.querySelector('#lgbtq-filter') as HTMLInputElement;
+                const bipocBox = this.shadowRoot.querySelector('#bipoc-filter') as HTMLInputElement;
+
+                fromSlider.value = `${this.initialMin}`;
+                console.log(toSlider.value);
+                toSlider.value = `${this.initialMax}`;
+                console.log(this.initialMax, toSlider.value);
+
                 this.fillSlider(fromSlider, toSlider, '#C6C6C6', '#602983', toSlider);
                 this.setToggleAccessible(toSlider);
 
@@ -251,10 +276,18 @@ class TagMenu extends HTMLElement {
                 toSlider!.oninput = () => this.controlToSlider(fromSlider, toSlider);
 
                 fromSlider.addEventListener('input', ()=>{
-                    this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax)}}))
+                    this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));
                 });
                 toSlider.addEventListener('input', ()=>{
-                    this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax)}}))
+                    this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));
+                });
+
+                bipocBox.addEventListener('input', ()=>{
+                    this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));
+                });
+
+                lgbtqBox.addEventListener('input', ()=>{
+                    this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));
                 });
             }
         }

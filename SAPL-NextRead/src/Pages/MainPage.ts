@@ -15,7 +15,7 @@ import UseState from '../Types/UseState';
 
 export class MainPage extends HTMLElement {
     #books: book[] = [];
-    _useState: UseState = {whiteList:[], blackList:[], ageRange: ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult']};
+    _useState: UseState = {whiteList:[], blackList:[], ageRange: ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'], bipocFilter: false, lgbtqFilter: false};
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -45,6 +45,7 @@ export class MainPage extends HTMLElement {
 
     set useState(newState : UseState) {
         this._useState = { ...this._useState, ...newState };
+        console.log(this.useState);
         this.render();
     }
 
@@ -55,12 +56,12 @@ export class MainPage extends HTMLElement {
     // 3. Example internal method that updates the lists
     addToWhiteList(item: Tag) {
         const updatedWhiteList = [...this._useState.whiteList, item];
-        this.useState = { whiteList: updatedWhiteList, blackList: this._useState.blackList, ageRange: this._useState.ageRange }; // Uses the setter above
+        this.useState = { whiteList: updatedWhiteList, blackList: this._useState.blackList, ageRange: this._useState.ageRange, bipocFilter: this._useState.bipocFilter, lgbtqFilter: this._useState.lgbtqFilter }; // Uses the setter above
     }
 
     addToBlackList(item: Tag) {
         const updatedBlackList = [...this._useState.blackList, item];
-        this.useState = { whiteList: this._useState.whiteList, blackList: updatedBlackList, ageRange: this._useState.ageRange }; // Uses the setter above
+        this.useState = { whiteList: this._useState.whiteList, blackList: updatedBlackList, ageRange: this._useState.ageRange, bipocFilter: this._useState.bipocFilter, lgbtqFilter: this._useState.lgbtqFilter }; // Uses the setter above
     }
 
 
@@ -108,7 +109,7 @@ export class MainPage extends HTMLElement {
                     x = -1;
                     // get book recommendations from Hardcover
                     loadingScreen!.style.display = 'flex';
-                    this.#books = await getRecommendations(searchBar.value);
+                    this.#books = await getRecommendations(searchBar.value, this.useState.bipocFilter, this.useState.lgbtqFilter);
                     // filter out all the duplicates
                     if (this.#books.length > 0) {
                         this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
@@ -153,7 +154,7 @@ export class MainPage extends HTMLElement {
                 if (x >= this.#books.length -3){
                     iteration += 1;
                     loadingScreen!.style.display = 'flex';
-                    let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value, iteration);
+                    let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value,this.useState.bipocFilter, this.useState.lgbtqFilter, iteration);
                     newBooks = [...new Set(newBooks.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     newBooks = await this.availabilityCheck(newBooks);
                     this.#books = [...this.#books, ...newBooks];

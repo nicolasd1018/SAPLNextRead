@@ -36,7 +36,7 @@
     }
     #misc-space{
         display: none;
-        
+        flex-direction: column;
     }
     datalist {
         display: flex;
@@ -98,6 +98,9 @@
     input[type=range]::-moz-range-thumb { 
         pointer-events: all; 
     }
+    input[type=checkbox] {
+        accent-color: #602983;
+    }
 
 </style>
 
@@ -119,9 +122,16 @@
         </div>
     </div>
     <div id="misc-space">
+        <div style="display: flex; flex-direction: row; gap: 25px;">
+            <label for="bipoc-filter" title="BIPOC stands for 'Black, Indigenous, and People Of Color'. This will limit the search to only authors who are BIPOC.">BIPOC only?</label>
+            <input type="checkbox" id="bipoc-filter" name="bipoc-filter" value="BIPOC">
+        </div>
+        <div style="display: flex; flex-direction: row; gap: 22px;">
+            <label for="lgbtq-filter" title="LGBTQ stands for 'Lesbian, Gay, Bisexual, Transgender, and Queer'. This will limit the search to only authors who are LGBTQ.">LGBTQ only?</label>
+            <input type="checkbox" id="lgbtq-filter" name="lgbtq-filter" value="lgbtq">
+        </div>
         <label for="age-range-slider">Age Range</label>
         <section id="age-range-slider" class="range-slider">
-            
             <span class="rangeValues"></span>
             <input id="from-slider" value="0" min="0" max="4" step="1" type="range" list="markers">
             <input id="to-slider" value="4" min="0" max="4" step="1" type="range" list="markers">

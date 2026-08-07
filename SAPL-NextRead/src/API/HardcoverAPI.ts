@@ -25,7 +25,7 @@ export interface book {
     id: number
     image: {url: string }
     title: string
-    contributions: {author: {name:string}}[]
+    contributions: {author: {name:string, is_bipoc: boolean, is_lgbtq: boolean}}[]
     description: string
     subtitle: string
     book_series: {position: number, series: {name: string, books_count: number}}[]
@@ -35,7 +35,7 @@ export interface book {
     ageRating: string
 }
 // const client = ...
-export const getRecommendations = async (title: string, iteration?: number): Promise<book[]>=> {
+export const getRecommendations = async (title: string, bipocFilter: boolean, lgbtqFilter:boolean, iteration?: number): Promise<book[]>=> {
     var reccomendation: book[] =  [];
     await client
     .query({
@@ -51,7 +51,11 @@ export const getRecommendations = async (title: string, iteration?: number): Pro
         id
         title
         subtitle
-        contributions{author{name}}
+        contributions{author
+            {name
+            is_bipoc
+            is_lgbtq
+            }}
         description
         book_series {
             position
@@ -92,7 +96,7 @@ export const getRecommendations = async (title: string, iteration?: number): Pro
                 user_books (where: {rating: {_gte: 4}}
                             ${iteration ? `offset: ${10* iteration}` : ''} limit: 10){
                 user{
-                    user_books (where:{_and: [{rating: {_gte: 4}}, {book: {title: {_neq: "${title}"}}}]}
+                    user_books (where:{_and: [{rating: {_gte: 4}}, {book: {title: {_neq: "${title}"}}}${bipocFilter ? ", {book: {contributions: {author: {is_bipoc: {_eq: true}}}}}": ''}${lgbtqFilter ? ", {book: {contributions: {author: {is_lgbtq: {_eq: true}}}}}": ''}]}
                                 order_by: {rating: desc}
       
                                  limit: 5){
