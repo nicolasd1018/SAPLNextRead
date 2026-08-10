@@ -81,6 +81,8 @@ class TagMenu extends HTMLElement {
     ages = ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'];
     initialMin = 0
     initialMax = 4;
+    is_bipoc = false;
+    is_lgbtq = false
 
     get ageRangeMax(): number {
         if (this.shadowRoot) {
@@ -274,6 +276,9 @@ class TagMenu extends HTMLElement {
 
                 fromSlider!.oninput = () => this.controlFromSlider(fromSlider, toSlider);
                 toSlider!.oninput = () => this.controlToSlider(fromSlider, toSlider);
+
+                lgbtqBox.checked = this.is_lgbtq;
+                bipocBox.checked = this.is_bipoc;
 
                 fromSlider.addEventListener('input', ()=>{
                     this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));

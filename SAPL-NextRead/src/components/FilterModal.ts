@@ -81,6 +81,8 @@ export default class FilterModal extends HTMLElement{
                 console.log(ages.findIndex((age)=> age=== this.useState.ageRange[0]));
                 (tagSpace as TagMenu).initialMin = ages.findIndex((age)=> age=== this.useState.ageRange[0]);
                 (tagSpace as TagMenu).initialMax = ages.findIndex((age)=> age=== this.useState.ageRange.at(-1));
+                (tagSpace as TagMenu).is_bipoc = this.useState.bipocFilter;
+                (tagSpace as TagMenu).is_lgbtq = this.useState.lgbtqFilter;
 
                 (tagSpace as TagMenu).render();
             }
