@@ -30,6 +30,7 @@ import './index.css';
 import './Pages/MainPage'
 import './Pages/BookPage'
 import './components/Header'
+import './Pages/AccountSelectionPage'
 import { book } from './API/HardcoverAPI';
 import { MainPage } from './Pages/MainPage';
 import { USBDevice } from 'electron';
@@ -43,11 +44,11 @@ console.log(
 const mainPage = document.createElement('main-page');
 const bookPage = document.createElement('book-page');
 const header = document.createElement('nextread-header');
+const accountSelectionPage = document.createElement('account-selection-page')
 
 export const changePage = (book: book | undefined = undefined) => {
   if (book) {
     mainPage.style.display = 'none';
-    console.log(book);
     bookPage.setAttribute('imgUrl', book.image.url);
     bookPage.setAttribute('bookTitle', book.title);
     bookPage.setAttribute('subtitle', book.subtitle);
@@ -74,4 +75,4 @@ export const setUseState = (useState: UseState) => {
 
 
 document.body.appendChild(header);
-document.body.appendChild(mainPage);
+document.body.appendChild(accountSelectionPage);
