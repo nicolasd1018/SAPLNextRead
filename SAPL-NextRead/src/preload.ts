@@ -8,3 +8,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     runAgeFinder: (text: string) => ipcRenderer.invoke('run-age-finder', text)
 });
     
+contextBridge.exposeInMainWorld('api', {
+    addUser: (userName: string) => ipcRenderer.invoke('make-user', userName),
+});

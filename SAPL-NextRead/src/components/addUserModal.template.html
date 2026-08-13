@@ -1,0 +1,50 @@
+<style>
+    #modal-background {
+        display: flex; 
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        justify-content: center;
+        justify-items: center;
+        align-items: center;
+        position: fixed;
+    }
+    #error-container{
+        background-color: white;
+        display: flex;
+        padding: 10px;
+        width: 400px;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+    #close-button{
+        width: fit-content;
+    }
+    #message{
+        text-align: center;
+    }
+    #title{
+        font-weight: bold;
+        font-size: large;
+    }
+    #username-container {
+        flex-direction: row;
+        display: flex;
+        gap: 20px;
+    }
+</style>
+
+<div id="modal-background">
+    <div id="error-container">
+        <div id="title">Add User</div>
+        <div id="username-container">
+            <label for="username">Username</label>
+            <input id="username"></input>
+        </div>
+        <button id="close-button">Close</button>
+    </div>
+</div>

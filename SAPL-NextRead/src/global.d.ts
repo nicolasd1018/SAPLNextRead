@@ -6,5 +6,8 @@ declare global {
       runWebScraper: (text: string) => Promise<string[]>;
       runAgeFinder: (title: string, subtitle) => Promise<string[]>;
     };
+    api: {
+      addUser: (username: string) => Promise<void>;
+    }
   }
 }

@@ -1,5 +1,5 @@
 import templateString from '../components/ErrorModal.template.html?raw';
-import './tagMenu';
+import './TagMenu'
 export default class ErrorModal extends HTMLElement{
     constructor() {
         super();

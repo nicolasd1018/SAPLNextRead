@@ -23,29 +23,31 @@ const dbPath = path.join(userDataPath, 'SAPL_NextRead_database.db');
 const db = new DatabaseSync(dbPath);
 
 db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    FOREIGN KEY (useState_id) REFERENCES useState(id) ,
-    username TEXT NOT NULL,
-    salt TEXT,
-    password TEXT, 
-    profilePicture TEXT,
-  );
-
   CREATE TABLE IF NOT EXISTS useStates (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   whiteList TEXT NOT NULL DEFAULT '',
   blackList TEXT NOT NULL DEFAULT '',
   ageRange TEXT NOT NULL DEFAULT '',
-  bipocFilter BOOLEAN NOT NULL DEFAULT 0 CHECK (is_active IN (0, 1)),
-  lgbtqFilter BOOLEAN NOT NULL DEFAULT 0 CHECK (is_active IN (0, 1)),
+  bipocFilter BOOLEAN NOT NULL DEFAULT 0,
+  lgbtqFilter BOOLEAN NOT NULL DEFAULT 0
   );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    useState_id INTEGER,
+    username TEXT NOT NULL,
+    salt TEXT,
+    password TEXT, 
+    profilePicture TEXT,
+    FOREIGN KEY (useState_id) REFERENCES useState(id) 
+  );  
 
   CREATE TABLE IF NOT EXISTS bookLists (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
   name TEXT NOT NULL,
   books TEXT NOT NULL DEFAULT '',
-  FOREIGN KEY (user_id) REFERENCES user(id),
+  FOREIGN KEY (user_id) REFERENCES user(id)
   );
 `);
 
@@ -56,8 +58,7 @@ ipcMain.handle('make-user', async (event, username: string) => {
         const useStateId = useState.lastInsertRowid;
         
         const createUser = db.prepare(`INSERT INTO users (useState_id, username) VALUES (?, ?)`);
-        const user: User = { userName: username, useState};
-        return user;
+        createUser.run(useStateId, username);
     } catch (error) {
         console.error("Database query failed:", error);
         throw error;
