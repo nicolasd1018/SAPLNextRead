@@ -5,7 +5,6 @@ export default interface User {
     id: number
     useState: UseState;
     userName: string;
-    salt?: string;
     password?: string;
     searchLists: BookList[];
     profilePicture?: string;

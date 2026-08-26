@@ -24,27 +24,40 @@
     #close-button{
         width: fit-content;
     }
-    #message{
-        text-align: center;
-    }
     #title{
         font-weight: bold;
         font-size: large;
     }
-    #username-container {
+    .horizontal-container {
         flex-direction: row;
         display: flex;
-        gap: 20px;
+        width: 350px;
+        justify-content: space-between;
+        align-content: space-between;
+    }
+    #password:invalid{
+        border: 2px dashed #ff4d4d;
     }
 </style>
 
 <div id="modal-background">
     <div id="error-container">
         <div id="title">Add User</div>
-        <div id="username-container">
-            <label for="username">Username</label>
-            <input id="username"></input>
+        <div class="horizontal-container">
+            <label for="username">Username*</label>
+            <input id="username"  minlength="4" required></input>
         </div>
-        <button id="close-button">Close</button>
+        <div class="horizontal-container">
+            <label title="Needs to be 8 characters long" for="password">Password</label>
+            <input title="Needs to be 8 characters long" type="password" minlength="8" id="password"></input>
+        </div>
+        <div class="horizontal-container">
+            <label title="Needs to match password" for="confirm-password">Confirm Password</label>
+            <input title="Needs to match password" type="password" id="confirm-password"></input>
+        </div>
+        <div class="horizontal-container">
+            <button id="close-button">Close</button>
+            <button disabled id="save-button">Create New User</button>
+        </div>
     </div>
 </div>

@@ -1,3 +1,5 @@
+import User from "./Types/User";
+
 export {};
 
 declare global {
@@ -7,7 +9,8 @@ declare global {
       runAgeFinder: (title: string, subtitle) => Promise<string[]>;
     };
     api: {
-      addUser: (username: string) => Promise<void>;
+      addUser: (username: string, password?: string) => Promise<void>;
+      getUsers: () => Promise<User[]>;
     }
   }
 }

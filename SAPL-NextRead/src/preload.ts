@@ -9,5 +9,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
 });
     
 contextBridge.exposeInMainWorld('api', {
-    addUser: (userName: string) => ipcRenderer.invoke('make-user', userName),
+    addUser: (userName: string, password?: string) => ipcRenderer.invoke('make-user', userName, password),
+    getUsers: () => ipcRenderer.invoke('get-users'),
 });

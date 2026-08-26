@@ -3,8 +3,14 @@ import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { PythonShell } from 'python-shell';
 import { fileURLToPath } from 'url';
-import { DatabaseSync } from 'node:sqlite'; 
+import { DatabaseSync, StatementResultingChanges } from 'node:sqlite'; 
 import User from './Types/User';
+import bcrypt from "bcryptjs";
+import UseState from './Types/UseState';
+import BookList from './Types/bookList';
+import { json } from 'node:stream/consumers';
+
+
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -25,9 +31,9 @@ const db = new DatabaseSync(dbPath);
 db.exec(`
   CREATE TABLE IF NOT EXISTS useStates (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  whiteList TEXT NOT NULL DEFAULT '',
-  blackList TEXT NOT NULL DEFAULT '',
-  ageRange TEXT NOT NULL DEFAULT '',
+  whiteList TEXT NOT NULL DEFAULT '[]',
+  blackList TEXT NOT NULL DEFAULT '[]',
+  ageRange TEXT NOT NULL DEFAULT '[]',
   bipocFilter BOOLEAN NOT NULL DEFAULT 0,
   lgbtqFilter BOOLEAN NOT NULL DEFAULT 0
   );
@@ -36,31 +42,60 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     useState_id INTEGER,
     username TEXT NOT NULL,
-    salt TEXT,
     password TEXT, 
     profilePicture TEXT,
-    FOREIGN KEY (useState_id) REFERENCES useState(id) 
+    FOREIGN KEY (useState_id) REFERENCES useStates(id) 
   );  
 
   CREATE TABLE IF NOT EXISTS bookLists (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER,
+  user_id INTEGER NOT NULL,
   name TEXT NOT NULL,
-  books TEXT NOT NULL DEFAULT '',
-  FOREIGN KEY (user_id) REFERENCES user(id)
+  books TEXT NOT NULL DEFAULT '[]',
+  FOREIGN KEY (user_id) REFERENCES users(id)
   );
 `);
 
-ipcMain.handle('make-user', async (event, username: string) => {
+ipcMain.handle('make-user', async (event, username: string, password?: string) => {
     try {
         const createUseState = db.prepare(`INSERT INTO useStates DEFAULT VALUES`);
         const useState = createUseState.run();
         const useStateId = useState.lastInsertRowid;
-        
-        const createUser = db.prepare(`INSERT INTO users (useState_id, username) VALUES (?, ?)`);
-        createUser.run(useStateId, username);
+        let user: StatementResultingChanges;
+        if (password) {
+          const createUser = db.prepare(`INSERT INTO users (useState_id, username, password) VALUES (?, ?, ?)`);
+          const manualSalt = bcrypt.genSaltSync(10);
+          const manualHash = bcrypt.hashSync(password, manualSalt);
+          user = createUser.run(useStateId, username, manualHash );
+        }
+        else {
+          const createUser = db.prepare(`INSERT INTO users (useState_id, username) VALUES (?, ?)`);
+          user = createUser.run(useStateId, username);
+        }
+        const userId = user.lastInsertRowid;
+        const createBookList = db.prepare('INSERT INTO bookLists (user_id, name) VALUES (?,?)');
+        createBookList.run(userId, 'Liked Books');
+        createBookList.run(userId, 'Disliked Books');
     } catch (error) {
-        console.error("Database query failed:", error);
+        console.error("Database query make-user failed:", error);
+        throw error;
+    }
+});
+
+ipcMain.handle('get-users', async (event, username: string, password?: string) => {
+    try {
+        const getUsers = db.prepare(`SELECT * FROM users`);
+        const users = getUsers.all();
+         return users.map((preUser)=> {
+          const getUseState = db.prepare(`SELECT * FROM useStates WHERE id = ?`);
+          const useState = getUseState.get(preUser.useState_id);
+          const getBookLists = db.prepare(`SELECT * FROM bookLists WHERE user_id= ?`);
+          const bookLists = getBookLists.all(preUser.id);
+          const newUser: User = {id: preUser.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[]]  };
+         return newUser;
+        })
+    } catch (error) {
+        console.error("Database query get-users failed:", error);
         throw error;
     }
 });
