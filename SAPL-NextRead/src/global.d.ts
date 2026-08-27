@@ -11,6 +11,7 @@ declare global {
     api: {
       addUser: (username: string, password?: string) => Promise<void>;
       getUsers: () => Promise<User[]>;
+      getPassword: (id: number) => Promise<string>;
     }
   }
 }

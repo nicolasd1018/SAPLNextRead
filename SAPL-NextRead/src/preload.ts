@@ -11,4 +11,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
 contextBridge.exposeInMainWorld('api', {
     addUser: (userName: string, password?: string) => ipcRenderer.invoke('make-user', userName, password),
     getUsers: () => ipcRenderer.invoke('get-users'),
+    getPassword: (id: number) => ipcRenderer.invoke('get-password', id),
 });

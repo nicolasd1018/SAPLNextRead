@@ -9,6 +9,7 @@ import bcrypt from "bcryptjs";
 import UseState from './Types/UseState';
 import BookList from './Types/bookList';
 import { json } from 'node:stream/consumers';
+import { number } from 'mathjs';
 
 
 
@@ -82,7 +83,7 @@ ipcMain.handle('make-user', async (event, username: string, password?: string) =
     }
 });
 
-ipcMain.handle('get-users', async (event, username: string, password?: string) => {
+ipcMain.handle('get-users', async (event) => {
     try {
         const getUsers = db.prepare(`SELECT * FROM users`);
         const users = getUsers.all();
@@ -91,7 +92,7 @@ ipcMain.handle('get-users', async (event, username: string, password?: string) =
           const useState = getUseState.get(preUser.useState_id);
           const getBookLists = db.prepare(`SELECT * FROM bookLists WHERE user_id= ?`);
           const bookLists = getBookLists.all(preUser.id);
-          const newUser: User = {id: preUser.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[]]  };
+          const newUser: User = {id: preUser.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[]]};
          return newUser;
         })
     } catch (error) {
@@ -99,6 +100,13 @@ ipcMain.handle('get-users', async (event, username: string, password?: string) =
         throw error;
     }
 });
+
+ipcMain.handle('get-password', async (event, id: number) =>{
+    const getPassword = db.prepare(`SELECT password FROM users WHERE id = ?`);
+    const password = getPassword.get(id);
+    
+    return password ? password.password : null;
+})
 
 
 const createWindow = () => {

@@ -1,6 +1,8 @@
 import templateString from '../Pages/AccountSelectionPage.template.html?raw';
 import '../components/addUserModal'
 import AddUserModal from '../components/addUserModal';
+import '../components/PasswordModal';
+import PasswordModal from '../components/PasswordModal';
 
 export default class AccountSelectionPage extends HTMLElement {
     constructor() {
@@ -18,9 +20,10 @@ export default class AccountSelectionPage extends HTMLElement {
             const container = this.shadowRoot.getElementById('account-selection-page-container');
             const createUserButton = this.shadowRoot.getElementById('create-new-account-button');
             const addUserModal = this.shadowRoot.querySelector('add-user-modal') as AddUserModal;
+            const users = await window.api.getUsers();
 
             if (container) {
-                const users = await window.api.getUsers();
+                
                 users.forEach(user => {
                     const userHolder = document.createElement('div');
                     userHolder.id = `${user.id}-${user.userName}-holder`;
@@ -53,8 +56,14 @@ export default class AccountSelectionPage extends HTMLElement {
 
             const userPics = this.shadowRoot.querySelectorAll('.user-button');
             userPics.forEach((userPic) => {
-                userPic.addEventListener('click', ()=>{
-                    
+                userPic.addEventListener('click', async ()=>{
+                    const id: number = Number(userPic.id.split('-')[0]);
+                    const passwordModal = this.shadowRoot?.querySelector('password-modal');
+                    const password = await window.api.getPassword(id);
+                    if (password !== null && passwordModal) {
+                        (passwordModal as PasswordModal).password = password;
+                        (passwordModal as PasswordModal).style.display = 'flex';
+                    }
                 })
             })
         }
