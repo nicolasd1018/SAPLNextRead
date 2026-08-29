@@ -34,7 +34,7 @@ db.exec(`
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   whiteList TEXT NOT NULL DEFAULT '[]',
   blackList TEXT NOT NULL DEFAULT '[]',
-  ageRange TEXT NOT NULL DEFAULT '[]',
+  ageRange TEXT NOT NULL DEFAULT '${JSON.stringify(['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'])}',
   bipocFilter BOOLEAN NOT NULL DEFAULT 0,
   lgbtqFilter BOOLEAN NOT NULL DEFAULT 0
   );

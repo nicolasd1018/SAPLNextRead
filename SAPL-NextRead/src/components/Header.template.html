@@ -1,17 +1,18 @@
 <style>
     #header {
         display: flex; 
-        justify-content: left; 
+        justify-content: space-between; 
         border-bottom: 5px solid #602983; 
         width: 100vw;
-        :hover{
-            cursor: pointer;
-        }
+        
     }
     #name-and-tagline{
         display: flex; 
         align-items: center; 
         flex-direction: column;
+    }
+    #name-and-tagline:hover {
+            cursor: pointer;
     }
     #name{
         font-family: Inter, sans-serif;
@@ -20,6 +21,22 @@
     }
     #tagline{
         font-size: 28px;
+    }
+    #profile-pic{
+        width: 100px;
+        height: 100px;
+    }
+    #user-profile {
+        display: none;
+        flex-direction: column;
+        padding-right: 15px;
+        background-color: #602983;
+        padding-left: 15px;
+    }
+    #profile-menu{
+        background-color: #602983;
+        color: white;
+        border: none;
     }
 </style>
 
@@ -34,5 +51,12 @@
                 Find your next favorite
             </div>
         </div>
+    </div>
+    <div id="user-profile">
+        <img id="profile-pic" src="/placeholder_profile_pick.png">
+        <select id="profile-menu" name="Profile">
+            <option id="name" value="" disabled selected hidden></option>
+            <option value="Logout">Logout</option>
+        </select>
     </div>
 </div>

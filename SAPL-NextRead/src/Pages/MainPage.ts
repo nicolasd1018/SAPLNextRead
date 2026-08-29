@@ -8,7 +8,6 @@ import '../components/ErrorModal'
 import ErrorModal from '../components/ErrorModal';
 import Tag from '../Types/Tag';
 import FilterModal from '../components/FilterModal';
-import UseState from '../Types/UseState';
 import User from '../Types/User';
 
 
@@ -16,7 +15,7 @@ import User from '../Types/User';
 
 export class MainPage extends HTMLElement {
     #books: book[] = [];
-    _user: User =  {id: -1, useState: {whiteList: [], blackList: [], ageRange: ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'], bipocFilter: false, lgbtqFilter: false}, userName: '', searchLists: []};
+    _user: User | undefined =  undefined;
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -44,9 +43,8 @@ export class MainPage extends HTMLElement {
         return books.filter((book)=> book.ageRating !== 'Error Retrieving Age');
     }
 
-    set user(newUser : User) {
-        this._user = { ...this._user, ...newUser };
-        console.log(this.user);
+    set user(newUser : User | undefined) {
+        this._user = newUser ? { ...this._user, ...newUser }: undefined;
         this.render();
     }
 
@@ -56,13 +54,13 @@ export class MainPage extends HTMLElement {
 
     // 3. Example internal method that updates the lists
     addToWhiteList(item: Tag) {
-        const updatedWhiteList = [...this._user.useState.whiteList, item];
-        this._user.useState = { whiteList: updatedWhiteList, blackList: this._user.useState.blackList, ageRange: this._user.useState.ageRange, bipocFilter: this._user.useState.bipocFilter, lgbtqFilter: this._user.useState.lgbtqFilter }; // Uses the setter above
+        const updatedWhiteList = [...this._user!.useState.whiteList, item];
+        this._user!.useState = { whiteList: updatedWhiteList, blackList: this._user!.useState.blackList, ageRange: this._user!.useState.ageRange, bipocFilter: this._user!.useState.bipocFilter, lgbtqFilter: this._user!.useState.lgbtqFilter }; // Uses the setter above
     }
 
     addToBlackList(item: Tag) {
-        const updatedBlackList = [...this._user.useState.blackList, item];
-        this._user.useState = { whiteList: this._user.useState.whiteList, blackList: updatedBlackList, ageRange: this._user.useState.ageRange, bipocFilter: this._user.useState.bipocFilter, lgbtqFilter: this._user.useState.lgbtqFilter }; // Uses the setter above
+        const updatedBlackList = [...this._user!.useState.blackList, item];
+        this._user!.useState = { whiteList: this._user!.useState.whiteList, blackList: updatedBlackList, ageRange: this._user!.useState.ageRange, bipocFilter: this._user!.useState.bipocFilter, lgbtqFilter: this._user!.useState.lgbtqFilter }; // Uses the setter above
     }
 
 
@@ -71,24 +69,26 @@ export class MainPage extends HTMLElement {
     }
 
     filterBooks () {
-        if (this.user.useState.whiteList.filter((tag) => tag.type === 'genre').length !== 0) 
-            this.#books = this.#books.filter((book)=>book.genres.some((genre)=> {return this.user.useState.whiteList.map((tag)=> tag.name).includes(genre.tag.tag);}));
-        if (this.user.useState.whiteList.filter((tag) => tag.type === 'mood').length !== 0) 
-            this.#books = this.#books.filter((book)=>book.moods.some((mood)=> {return this.user.useState.whiteList.map((tag)=> tag.name).includes(mood.tag.tag);}));
-        if (this.user.useState.whiteList.filter((tag) => tag.type === 'content-warning').length !== 0) 
-            this.#books = this.#books.filter((book)=>book.contentWarnings.some((contentWarning)=> {return this.user.useState.whiteList.map((tag)=> tag.name).includes(contentWarning.tag.tag);}));
+        if ( this.user) {
+            if (this.user.useState.whiteList.filter((tag) => tag.type === 'genre').length !== 0) 
+                this.#books = this.#books.filter((book)=>book.genres.some((genre)=> {return this.user!.useState.whiteList.map((tag)=> tag.name).includes(genre.tag.tag);}));
+            if (this.user.useState.whiteList.filter((tag) => tag.type === 'mood').length !== 0) 
+                this.#books = this.#books.filter((book)=>book.moods.some((mood)=> {return this.user!.useState.whiteList.map((tag)=> tag.name).includes(mood.tag.tag);}));
+            if (this.user.useState.whiteList.filter((tag) => tag.type === 'content-warning').length !== 0) 
+                this.#books = this.#books.filter((book)=>book.contentWarnings.some((contentWarning)=> {return this.user!.useState.whiteList.map((tag)=> tag.name).includes(contentWarning.tag.tag);}));
 
-        if (this.user.useState.blackList.filter((tag) => tag.type === 'genre').length !== 0) 
-            this.#books = this.#books.filter((book)=>book.genres.every((genre)=> {console.log(this.user.useState.blackList.map((tag)=> tag.name), genre.tag.tag, this.user.useState.blackList.map((tag)=> tag.name).includes(genre.tag.tag));return !this.user.useState.blackList.map((tag)=> tag.name).includes(genre.tag.tag);}));
-        if (this.user.useState.blackList.filter((tag) => tag.type === 'mood').length !== 0)  
-            this.#books = this.#books.filter((book)=>book.moods.every((mood)=> {return !this.user.useState.blackList.map((tag)=> tag.name).includes(mood.tag.tag);}));
-        if (this.user.useState.blackList.filter((tag) => tag.type === 'content-warning').length !== 0) 
-            this.#books = this.#books.filter((book)=>book.contentWarnings.every((contentWarning)=> {return !this.user.useState.blackList.map((tag)=> tag.name).includes(contentWarning.tag.tag);}));
-        this.#books = this.#books.filter((book) => this.user.useState.ageRange.includes(book.ageRating));
+            if (this.user.useState.blackList.filter((tag) => tag.type === 'genre').length !== 0) 
+                this.#books = this.#books.filter((book)=>book.genres.every((genre)=> {console.log(this.user!.useState.blackList.map((tag)=> tag.name), genre.tag.tag, this.user!.useState.blackList.map((tag)=> tag.name).includes(genre.tag.tag));return !this.user!.useState.blackList.map((tag)=> tag.name).includes(genre.tag.tag);}));
+            if (this.user.useState.blackList.filter((tag) => tag.type === 'mood').length !== 0)  
+                this.#books = this.#books.filter((book)=>book.moods.every((mood)=> {return !this.user!.useState.blackList.map((tag)=> tag.name).includes(mood.tag.tag);}));
+            if (this.user.useState.blackList.filter((tag) => tag.type === 'content-warning').length !== 0) 
+                this.#books = this.#books.filter((book)=>book.contentWarnings.every((contentWarning)=> {return !this.user!.useState.blackList.map((tag)=> tag.name).includes(contentWarning.tag.tag);}));
+            this.#books = this.#books.filter((book) => this.user!.useState.ageRange.includes(book.ageRating));
+        }
     }
 
   render() {
-    if (this.shadowRoot) {
+    if (this.shadowRoot && this.user) {
         this.shadowRoot.innerHTML = templateString;
         const searchBar = this.shadowRoot.querySelector("nextread-searchbar")?.shadowRoot?.getElementById("search-bar");
         const bookSpace = this.shadowRoot.getElementById("book-space");
@@ -110,7 +110,7 @@ export class MainPage extends HTMLElement {
                     x = -1;
                     // get book recommendations from Hardcover
                     loadingScreen!.style.display = 'flex';
-                    this.#books = await getRecommendations(searchBar.value, this.user.useState.bipocFilter, this.user.useState.lgbtqFilter);
+                    this.#books = await getRecommendations(searchBar.value, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter);
                     // filter out all the duplicates
                     if (this.#books.length > 0) {
                         this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
@@ -130,7 +130,7 @@ export class MainPage extends HTMLElement {
                                     const bookIndex = Number(bc.getAttribute('data-book-index'));
                                     if (bookIndex >= 0){
                                         bc.addEventListener("click", async (event) => {
-                                            changePage(this.#books[bookIndex])
+                                            changePage(undefined, this.#books[bookIndex])
                                         })
                                     }
                                 })
@@ -155,7 +155,7 @@ export class MainPage extends HTMLElement {
                 if (x >= this.#books.length -3){
                     iteration += 1;
                     loadingScreen!.style.display = 'flex';
-                    let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value,this.user.useState.bipocFilter, this.user.useState.lgbtqFilter, iteration);
+                    let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
                     newBooks = [...new Set(newBooks.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     newBooks = await this.availabilityCheck(newBooks);
                     this.#books = [...this.#books, ...newBooks];
@@ -172,7 +172,7 @@ export class MainPage extends HTMLElement {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (x >= 0){
                                     bc.addEventListener("click", async (event) => {
-                                        changePage(this.#books[bookIndex])
+                                        changePage(undefined, this.#books[bookIndex])
                                     })
                                 }
                             })
@@ -195,7 +195,7 @@ export class MainPage extends HTMLElement {
                                 const bookIndex = Number(bc.getAttribute('data-book-index'));
                                 if (bookIndex >= 0){
                                     bc.addEventListener("click", async (event) => {
-                                        changePage(this.#books[bookIndex])
+                                        changePage(undefined, this.#books[bookIndex])
                                     })
                                 }
                             })
@@ -211,7 +211,7 @@ export class MainPage extends HTMLElement {
                     filterModal.style.display = 'flex';
                 }
             });
-            (filterModal as FilterModal).setUser(this._user);
+            (filterModal as FilterModal).setUser(this._user!);
             console.log('1.5', (filterModal as FilterModal).user);
         }
     }

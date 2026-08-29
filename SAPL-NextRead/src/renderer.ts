@@ -31,12 +31,13 @@ import './Pages/MainPage'
 import './Pages/BookPage'
 import './components/Header'
 import './Pages/AccountSelectionPage'
-import { book } from './API/HardcoverAPI';
+import { book as Book } from './API/HardcoverAPI';
 import { MainPage } from './Pages/MainPage';
 import { USBDevice } from 'electron';
 import UseState from './Types/UseState';
 import BookPage from './Pages/BookPage';
 import User from './Types/User';
+import Header from './components/Header';
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
@@ -47,7 +48,7 @@ const bookPage = document.createElement('book-page');
 const header = document.createElement('nextread-header');
 const accountSelectionPage = document.createElement('account-selection-page')
 
-export const changePage = (user?: User, book: book | undefined = undefined) => {
+export const changePage = (user?: User, book?: Book, logout: boolean = false) => {
   if (book) {
     mainPage.style.display = 'none';
     bookPage.setAttribute('imgUrl', book.image.url);
@@ -67,8 +68,13 @@ export const changePage = (user?: User, book: book | undefined = undefined) => {
   else if (user)
   {
     document.body.removeChild(accountSelectionPage);
-    setUseState(user);
+    setUser(user);
     document.body.appendChild(mainPage)
+  }
+  else if (logout){
+    setUser( undefined);
+    document.body.removeChild(mainPage);
+    document.body.appendChild(accountSelectionPage);
   }
   else {
     document.body.removeChild(bookPage);
@@ -76,8 +82,9 @@ export const changePage = (user?: User, book: book | undefined = undefined) => {
   }
 }
 
-export const setUseState = (user: User) => {
+export const setUser = (user: User | undefined) => {
   (mainPage as MainPage).user = user;
+  (header as Header).user = user;
 }
 
 

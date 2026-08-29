@@ -1,5 +1,5 @@
 import templateString from '../components/FilterModal.template.html?raw';
-import { setUseState } from '../renderer';
+import { setUser } from '../renderer';
 import User from '../Types/User';
 import './TagMenu';
 import TagMenu from './TagMenu';
@@ -88,7 +88,7 @@ export default class FilterModal extends HTMLElement{
 
             if (saveButton) {
                 saveButton.addEventListener('click', ()=>{
-                    setUseState(this.user);
+                    setUser(this.user);
                 })
             }
         }
