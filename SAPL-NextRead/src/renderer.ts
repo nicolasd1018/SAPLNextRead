@@ -36,6 +36,7 @@ import { MainPage } from './Pages/MainPage';
 import { USBDevice } from 'electron';
 import UseState from './Types/UseState';
 import BookPage from './Pages/BookPage';
+import User from './Types/User';
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
@@ -46,7 +47,7 @@ const bookPage = document.createElement('book-page');
 const header = document.createElement('nextread-header');
 const accountSelectionPage = document.createElement('account-selection-page')
 
-export const changePage = (book: book | undefined = undefined) => {
+export const changePage = (user?: User, book: book | undefined = undefined) => {
   if (book) {
     mainPage.style.display = 'none';
     bookPage.setAttribute('imgUrl', book.image.url);
@@ -63,14 +64,20 @@ export const changePage = (book: book | undefined = undefined) => {
 
     document.body.append(bookPage);
   }
+  else if (user)
+  {
+    document.body.removeChild(accountSelectionPage);
+    setUseState(user);
+    document.body.appendChild(mainPage)
+  }
   else {
     document.body.removeChild(bookPage);
     mainPage.style.display = 'block';
   }
 }
 
-export const setUseState = (useState: UseState) => {
-  (mainPage as MainPage).useState = useState;
+export const setUseState = (user: User) => {
+  (mainPage as MainPage).user = user;
 }
 
 

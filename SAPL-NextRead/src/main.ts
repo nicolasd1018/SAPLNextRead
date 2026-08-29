@@ -108,6 +108,18 @@ ipcMain.handle('get-password', async (event, id: number) =>{
     return password ? password.password : null;
 })
 
+ipcMain.handle('get-user', (event, id: number) => {
+  const getUser = db.prepare('SELECT id, useState_id, username FROM users WHERE id = ?');
+  const  preUser = getUser.get(id);
+
+  const getUseState = db.prepare(`SELECT * FROM useStates WHERE id = ?`);
+  const useState = getUseState.get(preUser!.useState_id);
+  const getBookLists = db.prepare(`SELECT * FROM bookLists WHERE user_id= ?`);
+  const bookLists = getBookLists.all(preUser!.id);
+  const newUser: User = {id: preUser!.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser!.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[]]};
+  return newUser;
+});
+
 
 const createWindow = () => {
   // Create the browser window.

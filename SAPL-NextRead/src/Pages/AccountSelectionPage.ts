@@ -3,6 +3,7 @@ import '../components/addUserModal'
 import AddUserModal from '../components/addUserModal';
 import '../components/PasswordModal';
 import PasswordModal from '../components/PasswordModal';
+import { changePage } from '../renderer';
 
 export default class AccountSelectionPage extends HTMLElement {
     constructor() {
@@ -62,7 +63,12 @@ export default class AccountSelectionPage extends HTMLElement {
                     const password = await window.api.getPassword(id);
                     if (password !== null && passwordModal) {
                         (passwordModal as PasswordModal).password = password;
+                        (passwordModal as PasswordModal).userId = id;
                         (passwordModal as PasswordModal).style.display = 'flex';
+                    }
+                    else {
+                        const user = await window.api.getUser(id);
+                        changePage(user);
                     }
                 })
             })

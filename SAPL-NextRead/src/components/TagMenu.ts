@@ -1,7 +1,6 @@
 import { first, from } from 'rxjs';
 import { getAllContentWarnings, getAllGenres, getAllMoods } from '../API/HardcoverAPI';
 import templateString from '../components/TagMenu.template.html?raw'
-import { setUseState } from '../renderer';
 import Tag from '../Types/Tag';
 
 class TagMenu extends HTMLElement {
