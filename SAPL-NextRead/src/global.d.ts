@@ -13,6 +13,7 @@ declare global {
       getUsers: () => Promise<User[]>;
       getPassword: (id: number) => Promise<string>;
       getUser: (id: number) => Promise<User>;
+      updateList: (id: number, list: string[]) => Promise<void>;
     }
   }
 }

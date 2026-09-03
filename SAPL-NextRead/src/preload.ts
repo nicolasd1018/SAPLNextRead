@@ -13,4 +13,5 @@ contextBridge.exposeInMainWorld('api', {
     getUsers: () => ipcRenderer.invoke('get-users'),
     getPassword: (id: number) => ipcRenderer.invoke('get-password', id),
     getUser: (id: number) => ipcRenderer.invoke('get-user', id),
+    updateList: (id: number, list: string[]) => ipcRenderer.invoke('update-list', id, list),
 });

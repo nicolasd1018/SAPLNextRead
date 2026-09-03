@@ -85,6 +85,7 @@ export const changePage = (user?: User, book?: Book, logout: boolean = false) =>
 export const setUser = (user: User | undefined) => {
   (mainPage as MainPage).user = user;
   (header as Header).user = user;
+  (bookPage as BookPage).user = user;
 }
 
 

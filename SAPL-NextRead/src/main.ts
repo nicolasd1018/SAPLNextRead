@@ -120,6 +120,11 @@ ipcMain.handle('get-user', (event, id: number) => {
   return newUser;
 });
 
+ipcMain.handle('update-list', (event, id: number, list: string[]) => {
+  const updateList = db.prepare(`UPDATE bookLists SET books = ? WHERE id = ?`);
+  updateList.run(JSON.stringify(list), id)
+});
+
 
 const createWindow = () => {
   // Create the browser window.

@@ -1,7 +1,10 @@
+import { add } from 'mathjs';
 import templateString from '../Pages/BookPage.template.html?raw';
+import User from '../Types/User';
 
 class BookPage extends HTMLElement {
     private _bookSeries:{position: number, series: {name: string, books_count: number}}[] = [];
+    private _user: User | undefined = undefined;
 
     get bookSeries(): {position: number, series: {name: string, books_count: number}}[] {
         return this._bookSeries;
@@ -9,6 +12,14 @@ class BookPage extends HTMLElement {
 
     set bookSeries(bookSeries: {position: number, series: {name: string, books_count: number}}[]) {
         this._bookSeries = bookSeries;
+    }
+
+    get user(): User | undefined {
+        return this._user;
+    }
+
+    set user(user: User | undefined) {
+        this._user = user;
     }
 
     constructor() {
@@ -40,6 +51,8 @@ class BookPage extends HTMLElement {
             const ageTag = this.shadowRoot.getElementById('age-rating');
             const ageRating = this.getAttribute('ageRating');
             const seriesTracker = this.shadowRoot.getElementById('series-tracker');
+            const addToList = this.shadowRoot.getElementById('add-to-list');
+            const removeFromList = this.shadowRoot.getElementById('remove-from-list');
 
 
             if (imgUrl && bookCover && bookCover instanceof HTMLImageElement){
@@ -112,6 +125,25 @@ class BookPage extends HTMLElement {
                     const seriesLine = document.createElement('div');
                     seriesLine.textContent = `${series.position} of ${series.series.books_count} in ${series.series.name}`;
                     seriesTracker.appendChild(seriesLine);
+                })
+            }
+
+            if (addToList) {
+                this.user?.searchLists.forEach((list)=> {
+                    const option = document.createElement('option') as HTMLOptionElement;
+                    option.id = `add-to-list-${list.id}`;
+                    option.value = `${list.id}`;
+                    option.textContent = list.name;
+                    addToList.appendChild(option);
+                });
+                
+                addToList.addEventListener('change', (event) => {
+                    const id = Number((event.target as HTMLSelectElement).value);
+                    (addToList as HTMLSelectElement).value = "";
+
+                    window.api.updateList(id,[...this.user!.searchLists.find((list)=> list.id === id)!.books, title!]).then(()=>{
+                        this.user!.searchLists.find((list)=> list.id === id)!.books=[...this.user!.searchLists.find((list)=> list.id === id)!.books, title!];
+                    })
                 })
             }
         }
