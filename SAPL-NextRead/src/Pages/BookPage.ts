@@ -128,13 +128,15 @@ class BookPage extends HTMLElement {
                 })
             }
 
-            if (addToList) {
+            if (addToList && removeFromList) {
                 this.user?.searchLists.forEach((list)=> {
-                    const option = document.createElement('option') as HTMLOptionElement;
-                    option.id = `add-to-list-${list.id}`;
-                    option.value = `${list.id}`;
-                    option.textContent = list.name;
-                    addToList.appendChild(option);
+                    if (!list.books.includes(title!)) {
+                        const option = document.createElement('option') as HTMLOptionElement;
+                        option.id = `add-to-list-${list.id}`;
+                        option.value = `${list.id}`;
+                        option.textContent = list.name;
+                        addToList.appendChild(option);
+                    }
                 });
                 
                 addToList.addEventListener('change', (event) => {
@@ -143,8 +145,37 @@ class BookPage extends HTMLElement {
 
                     window.api.updateList(id,[...this.user!.searchLists.find((list)=> list.id === id)!.books, title!]).then(()=>{
                         this.user!.searchLists.find((list)=> list.id === id)!.books=[...this.user!.searchLists.find((list)=> list.id === id)!.books, title!];
+                        const option = this.shadowRoot?.getElementById(`add-to-list-${id}`)!;
+                        addToList.removeChild(option);
+                        option.id = option.id.replace('add-to-list', 'remove-from-list');
+                        removeFromList.appendChild(option);
                     })
-                })
+                });
+
+                this.user?.searchLists.forEach((list)=> {
+                    if (list.books.includes(title!)) {
+                        const option = document.createElement('option') as HTMLOptionElement;
+                        option.id = `remove-from-list-${list.id}`;
+                        option.value = `${list.id}`;
+                        option.textContent = list.name;
+                        removeFromList.appendChild(option);
+                    }
+                });
+
+                removeFromList.addEventListener('change', (event) => {
+                    const id = Number((event.target as HTMLSelectElement).value);
+                    (removeFromList as HTMLSelectElement).value = "";
+
+                    window.api.updateList(id,this.user!.searchLists.find((list)=> list.id === id)!.books.filter((book)=>book !== title)).then(()=>{
+                        this.user!.searchLists.find((list)=> list.id === id)!.books=[...this.user!.searchLists.find((list)=> list.id === id)!.books, title!];
+
+                        const option = this.shadowRoot?.getElementById(`remove-from-list-${id}`)!;
+                        console.log(option);
+                        removeFromList.removeChild(option);
+                        option.id = option.id.replace('remove-from-list', 'add-to-list');
+                        addToList.appendChild(option);
+                    })
+                });
             }
         }
     }

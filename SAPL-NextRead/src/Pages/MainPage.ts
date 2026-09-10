@@ -1,5 +1,5 @@
 import templateString from '../Pages/MainPage.template.html?raw';
-import { book, getRecommendations } from '../API/HardcoverAPI';
+import { book, getBook, getRecommendations } from '../API/HardcoverAPI';
 import '../components/Searchbar.js'; 
 import { changePage } from '../renderer';
 import '../components/LoadingScreen';
@@ -25,9 +25,9 @@ export class MainPage extends HTMLElement {
 
         try {
             bookSpace!.innerHTML = ''
-            bookSpace!.innerHTML += x < 0 ? '<div style="width: 15vw; height: calc(15vw * 1.5);"></div>':`<img id="book-cover" data-book-index="${x}" class="book-cover" src=${books[x].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
-            bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+1}" class="book-cover" src=${books[x+1].image.url} style="width: 23vw; height: calc(23vw * 1.5);">`;
-            bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+2}" class="book-cover" src=${books[x+2].image.url} style="width: 15vw; height: calc(15vw * 1.5);">`;
+            bookSpace!.innerHTML += x < 0 ? '<div style="width: 15vw; height: calc(15vw * 1.5);"></div>':`<img id="book-cover" data-book-index="${x}" class="book-cover" src=${books[x].image.url} title="${books[x].title}" style="width: 15vw; height: calc(15vw * 1.5);">`;
+            bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+1}" class="book-cover" src=${books[x+1].image.url} title="${books[x+1].title}" style="width: 23vw; height: calc(23vw * 1.5);">`;
+            bookSpace!.innerHTML += `<img id="book-cover" data-book-index="${x+2}" class="book-cover" src=${books[x+2].image.url} title="${books[x+2].title}" style="width: 15vw; height: calc(15vw * 1.5);">`;
         } catch {}
     }
 
@@ -98,10 +98,12 @@ export class MainPage extends HTMLElement {
         const filterButton = this.shadowRoot.getElementById('filter-button');
         const filterModal = this.shadowRoot.getElementById('filter-modal');
         const errorModal = this.shadowRoot.getElementById('error-modal');
+        const bookTitle = this.shadowRoot.getElementById('book-title');
+        const searchedCover = this.shadowRoot.getElementById('searched-cover') as HTMLImageElement | undefined;
+        const bookslike = this.shadowRoot.getElementById('books-like');
         let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');;
         let x = -1;
         let iteration = 0;
-        console.log(this.user);
 
         if (searchBar && searchBar instanceof HTMLInputElement) {
             searchBar.addEventListener("keydown", async (event) => {
@@ -110,6 +112,7 @@ export class MainPage extends HTMLElement {
                     x = -1;
                     // get book recommendations from Hardcover
                     loadingScreen!.style.display = 'flex';
+                    const searchedBook: book = await getBook(searchBar.value) as unknown as book;
                     this.#books = await getRecommendations(searchBar.value, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter);
                     // filter out all the duplicates
                     if (this.#books.length > 0) {
@@ -135,6 +138,18 @@ export class MainPage extends HTMLElement {
                                     }
                                 })
                             }
+                        }
+
+                        if (bookTitle && searchedBook && searchedCover && bookslike) {
+                            bookslike.style.display = 'flex';
+                            bookTitle.textContent = searchedBook.title;
+                            bookTitle.addEventListener(('click'), () => {
+                                changePage(undefined, searchedBook);
+                            });
+                            searchedCover.src = searchedBook.image.url;
+                            searchedCover.addEventListener('click', () => {
+                                changePage(undefined, searchedBook);
+                            });
                         }
                     }
                     else if (errorModal && errorModal instanceof HTMLElement){

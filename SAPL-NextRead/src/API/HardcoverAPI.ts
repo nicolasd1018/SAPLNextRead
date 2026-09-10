@@ -35,6 +35,103 @@ export interface book {
     ageRating: string
 }
 // const client = ...
+
+export const getBook = async (title: string) => {
+    let book: book | undefined = undefined;
+    await client
+    .query({
+        query: gql`
+        fragment cover on books {
+  image {
+    url
+  }
+}
+
+fragment information on books {
+  id
+  title
+  subtitle
+  contributions {
+    author {
+      name
+      is_bipoc
+      is_lgbtq
+    }
+  }
+  description
+  book_series {
+    position
+    series {
+      name
+      books_count
+    }
+  }
+}
+
+fragment genres on books {
+  genres: taggable_counts(
+    where: {tag: {tag_category_id: {_eq: 1}}}
+    order_by: {count: desc_nulls_last}
+    limit: 5
+  ) {
+    tag {
+      tag
+    }
+  }
+}
+
+fragment contentWarnings on books {
+  contentWarnings: taggable_counts(
+    where: {tag: {tag_category_id: {_eq: 3}}}
+    order_by: {count: desc_nulls_last}
+  ) {
+    tag {
+      tag
+    }
+  }
+}
+
+fragment moods on books {
+  moods: taggable_counts(
+    where: {tag: {tag_category_id: {_eq: 4}}}
+    order_by: {count: desc_nulls_last}
+    limit: 5
+  ) {
+    tag {
+      tag
+    }
+  }
+}
+
+query MyQuery {
+  books(
+    where: {_and: [{title: {_eq: "${title}"}}, {users_read_count: {_gt: 0}}]}
+    order_by: {users_read_count: desc}
+    limit: 1
+  ) {
+    ...cover
+    ...information
+    ...genres
+    ...contentWarnings
+    ...moods
+  }
+}
+
+    `,
+        errorPolicy: 'all'
+    }).then((result) => { 
+        if ((result.data as {books: book[]}).books.length ===0) {
+            book = undefined
+        }
+        else
+         book = (result.data as { books:book[]}).books[0];
+        console.log((result.data as { books: book[]}).books[0]);
+    })
+    .catch((error)=>console.log(error));
+    return  book;
+
+
+}
 export const getRecommendations = async (title: string, bipocFilter: boolean, lgbtqFilter:boolean, iteration?: number): Promise<book[]>=> {
     var reccomendation: book[] =  [];
     await client

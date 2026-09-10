@@ -25,17 +25,15 @@ export default class AddUserModal extends HTMLElement{
 
             if (usernameInput) {
                 usernameInput.addEventListener('input', () => {
-                    if (usernameInput.checkValidity() && createUserButton) {
+                    if (usernameInput.checkValidity() && createUserButton && passwordInput.checkValidity() && confirmPasswordInput.value === passwordInput.value) {
                         createUserButton.disabled = false;
-                    } else if (createUserButton) {
-                        createUserButton.disabled = true;
+                    } else if (createUserButton ) {
                     }
                 })
             }
 
             if (createUserButton && usernameInput) {
                 createUserButton.addEventListener('click', ()=>{
-                    console.log(passwordInput.value);
                     window.api.addUser(usernameInput.value, (passwordInput.value ?? undefined));
                     usernameInput.value = '';
                     this.style.display = 'none';
@@ -45,7 +43,7 @@ export default class AddUserModal extends HTMLElement{
 
             if (passwordInput && confirmPasswordInput) {
                 passwordInput.addEventListener('input', ()=>{
-                    if (passwordInput.checkValidity() && confirmPasswordInput.value === passwordInput.value) {
+                    if (passwordInput.checkValidity() && confirmPasswordInput.value === passwordInput.value && usernameInput.checkValidity()) {
                         createUserButton.disabled = false;
                     }
                     else {
@@ -53,7 +51,7 @@ export default class AddUserModal extends HTMLElement{
                     }
                 });
                 confirmPasswordInput.addEventListener('input', ()=>{
-                    if (passwordInput.checkValidity() && confirmPasswordInput.value === passwordInput.value) {
+                    if (passwordInput.checkValidity() && confirmPasswordInput.value === passwordInput.value && usernameInput.checkValidity()) {
                         createUserButton.disabled = false;
                     }
                     else {

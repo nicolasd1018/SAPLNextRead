@@ -18,7 +18,7 @@
         position: absolute;
         width: 100vw;
         justify-content: space-between;
-        top: 30%;
+        top: 55%;
         align-items: center;
     }
     #left-arrow{
@@ -67,6 +67,28 @@
     error-modal{
         display: none;
     }
+    #books-like{
+        display: none;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+        gap: 5px;
+        font-size: 24px;
+    }
+    #book-title{
+        color: #02729e;
+    }
+    #searched-cover {
+        width: 10vw;
+        height: calc(10vw * 1.5);
+    }
+    #book-title:hover{
+        cursor: pointer;
+    }
+    #searched-cover:hover {
+        cursor: pointer;
+    }
 </style>
 
 <error-modal id="error-modal"></error-modal>
@@ -76,6 +98,11 @@
     <div id="search-rows" >
         <nextread-searchbar></nextread-searchbar>
         <button id="filter-button">Filter</button>
+    </div>
+    <div id="books-like">
+        <div>Books like</div>
+        <div id="book-title"></div>
+        <img id="searched-cover">
     </div>
     <div id="book-carousel">
          <img id="left-arrow" src="/Arrow.png" />
