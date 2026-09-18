@@ -11,10 +11,21 @@
     #search-bar { 
         height: 29px; 
         font-size: 20px;
+        margin-left: 7px;
+    }
+    #search-type {
+        border: 2px black solid;
     }
 </style>
 
 <div id="searchbar-container">
-    <div id="search-bar-label">Search By Title</div>
-    <input id="search-bar" type="text" />
+    <div id="search-bar-label">Search By </div>
+    <select id="search-type">
+        <option id="title" value="title">Title</option>
+        <option id="isbn10" value="isbn10">ISBN 10</option>
+        <option id="isbn13" value="isbn13">ISBN 13</option>
+        <option id="author" value="author">Author</option>
+        <option id="like-dislike" value="like-dislike">Like/Dislike List</option>
+    </select>
+    <input id="search-bar" type="text" required/>
 </div>

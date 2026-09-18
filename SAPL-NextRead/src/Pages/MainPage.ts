@@ -1,5 +1,5 @@
 import templateString from '../Pages/MainPage.template.html?raw';
-import { book, getBook, getRecommendations } from '../API/HardcoverAPI';
+import { book, getAuthorBooks, getBook, getListBooks, getRecommendations } from '../API/HardcoverAPI';
 import '../components/Searchbar.js'; 
 import { changePage } from '../renderer';
 import '../components/LoadingScreen';
@@ -9,6 +9,7 @@ import ErrorModal from '../components/ErrorModal';
 import Tag from '../Types/Tag';
 import FilterModal from '../components/FilterModal';
 import User from '../Types/User';
+import Searchbar from '../components/Searchbar.js';
 
 
 
@@ -91,6 +92,7 @@ export class MainPage extends HTMLElement {
     if (this.shadowRoot && this.user) {
         this.shadowRoot.innerHTML = templateString;
         const searchBar = this.shadowRoot.querySelector("nextread-searchbar")?.shadowRoot?.getElementById("search-bar");
+        const search = this.shadowRoot.querySelector("nextread-searchbar")
         const bookSpace = this.shadowRoot.getElementById("book-space");
         const rightArrow = this.shadowRoot.getElementById("right-arrow");
         const leftArrow = this.shadowRoot.getElementById("left-arrow");
@@ -104,16 +106,70 @@ export class MainPage extends HTMLElement {
         let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');;
         let x = -1;
         let iteration = 0;
+        let searchedBook: book;
 
-        if (searchBar && searchBar instanceof HTMLInputElement) {
+        if (searchBar && search && searchBar instanceof HTMLInputElement) {
+            search?.addEventListener('change-search-criteria', async ()=>{
+                loadingScreen!.style.display = 'flex';
+                this.#books = await getListBooks(this.user!.searchLists.find((list) => list.name = 'Liked Books')!.books, this.user!.searchLists.find((list) => list.name = 'Disliked Books')!.books,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter);
+                if (this.#books.length > 0) {
+                        this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
+                    
+                        // check to see if books are available in SAPL catalogue and filter out the ones that aren't
+                        this.#books = await this.availabilityCheck(this.#books);
+
+                        this.filterBooks();
+                        
+                        this.fillBookCarousel(this.#books, bookSpace!, x);
+                        if (bookSpace && bookSpace instanceof HTMLElement)
+                        {
+                            bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
+                            if (bookCovers) {
+                                bookCovers.forEach((bc)=> {
+                                    const bookIndex = Number(bc.getAttribute('data-book-index'));
+                                    if (bookIndex >= 0){
+                                        bc.addEventListener("click", async (event) => {
+                                            changePage(undefined, this.#books[bookIndex])
+                                        })
+                                    }
+                                })
+                            }
+                        }
+
+                        if (bookTitle && searchedBook && searchedCover && bookslike) {
+                            bookslike.style.display = 'flex';
+                            bookTitle.textContent = searchedBook.title;
+                            bookTitle.addEventListener(('click'), () => {
+                                changePage(undefined, searchedBook);
+                            });
+                            searchedCover.src = searchedBook.image.url;
+                            searchedCover.addEventListener('click', () => {
+                                changePage(undefined, searchedBook);
+                            });
+                        }
+                    }
+                    else if (errorModal && errorModal instanceof HTMLElement){
+                        errorModal.setAttribute('error-title', 'Search Input Error');
+                        errorModal.setAttribute('error-message', 'There has been an error finding books like the one  entered. The most likely explanation is that the title was input incorrectly. Please try again with the exact title, including exact capitalization, punctuation, and spacing.');
+                        (errorModal as ErrorModal).addInformation();
+                        errorModal.style.display = 'flex';
+                    }
+                    loadingScreen!.style.display = 'none';
+            });
             searchBar.addEventListener("keydown", async (event) => {
                 if (event.key === "Enter") {
                     event.preventDefault();
                     x = -1;
                     // get book recommendations from Hardcover
                     loadingScreen!.style.display = 'flex';
-                    const searchedBook: book = await getBook(searchBar.value) as unknown as book;
-                    this.#books = await getRecommendations(searchedBook.title, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter);
+                    if ((search as Searchbar).mode === 'author') {
+                        this.#books = await getAuthorBooks(searchBar.value, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter);
+                    }
+                    else {
+                        searchedBook = await getBook(searchBar.value) as unknown as book;
+                        this.#books = await getRecommendations(searchedBook.title, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter);
+                    }
+                    
                     // filter out all the duplicates
                     if (this.#books.length > 0) {
                         this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
@@ -169,13 +225,23 @@ export class MainPage extends HTMLElement {
                 if (x >= this.#books.length -3){
                     iteration += 1;
                     loadingScreen!.style.display = 'flex';
-                    let newBooks = await getRecommendations((searchBar as HTMLInputElement)!.value,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
+                    let newBooks = []
+                    if ((search as Searchbar).mode === 'author') {
+                        newBooks = await getAuthorBooks((searchBar as HTMLInputElement)!.value, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
+                    }
+                    if ((search as Searchbar).mode === 'like-dislike'){
+                        newBooks = await getListBooks(this.user!.searchLists.find((list) => list.name = 'Liked Books')!.books, this.user!.searchLists.find((list) => list.name = 'Disliked Books')!.books,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
+                    }
+                    else {
+                        newBooks = await getRecommendations(searchedBook.title,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
+                    }
                     newBooks = [...new Set(newBooks.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     newBooks = await this.availabilityCheck(newBooks);
                     this.#books = [...this.#books, ...newBooks];
                     this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     this.filterBooks();
                 }
+                 
                 this.fillBookCarousel(this.#books, bookSpace!, x);
                 loadingScreen!.style.display = 'none';
                 if (bookSpace && bookSpace instanceof HTMLElement)
