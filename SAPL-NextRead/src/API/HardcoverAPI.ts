@@ -34,98 +34,33 @@ export interface book {
     moods: {tag: {tag: string}}[]
     ageRating: string
 }
-// const client = ...
 
 export const getBook = async (title: string) => {
     let book: book | undefined = undefined;
     await client
     .query({
         query: gql`
-        fragment cover on books {
-  image {
-    url
-  }
-}
-
-fragment information on books {
-  id
-  title
-  subtitle
-  contributions {
-    author {
-      name
-      is_bipoc
-      is_lgbtq
-    }
-  }
-  description
-  book_series {
-    position
-    series {
-      name
-      books_count
-    }
-  }
-}
-
-fragment genres on books {
-  genres: taggable_counts(
-    where: {tag: {tag_category_id: {_eq: 1}}}
-    order_by: {count: desc_nulls_last}
-    limit: 5
+        query MySearchQuery {
+  search(
+    query: "${title}"
+    query_type: "Book"
+    per_page: 1
+    sort: "activities_count:desc"
   ) {
-    tag {
-      tag
-    }
+    results
   }
 }
-
-fragment contentWarnings on books {
-  contentWarnings: taggable_counts(
-    where: {tag: {tag_category_id: {_eq: 3}}}
-    order_by: {count: desc_nulls_last}
-  ) {
-    tag {
-      tag
-    }
-  }
-}
-
-fragment moods on books {
-  moods: taggable_counts(
-    where: {tag: {tag_category_id: {_eq: 4}}}
-    order_by: {count: desc_nulls_last}
-    limit: 5
-  ) {
-    tag {
-      tag
-    }
-  }
-}
-
-query MyQuery {
-  books(
-    where: {_and: [{title: {_eq: "${title}"}}, {users_read_count: {_gt: 0}}]}
-    order_by: {users_read_count: desc}
-    limit: 1
-  ) {
-    ...cover
-    ...information
-    ...genres
-    ...contentWarnings
-    ...moods
-  }
-}
-
     `,
         errorPolicy: 'all'
     }).then((result) => { 
-        if ((result.data as {books: book[]}).books.length ===0) {
+        console.log(result.data.search.results.hits[0].document);
+        if ((result.data as {search: {results: {hits: {document: {}}[]}}}).search.results.hits.length ===0) {
             book = undefined
         }
-        else
-         book = (result.data as { books:book[]}).books[0];
-        console.log((result.data as { books: book[]}).books[0]);
+        else {
+         const searchResult = (result.data as {search: {results: {hits: {document: {id: number, image: {url: string}, title: string, contributions: {author: {name:string, is_bipoc: boolean, is_lgbtq: boolean}}[], description: string, subtitle: string, featured_series: {position: number, series: {primary_books_count: number, name: string }}, genres:string[], content_warnings: string[], moods: string[]}}[]}}}).search.results.hits[0].document;
+         book = {...searchResult, book_series: [{position: searchResult.featured_series.position, series: {name: searchResult.featured_series.series.name, books_count: searchResult.featured_series.series.primary_books_count}}], genres: searchResult.genres.map((genre)=> {return {tag: {tag: genre}}}), contentWarnings: searchResult.content_warnings.map((contentWarning)=> {return {tag: {tag: contentWarning}}}), moods: searchResult.moods.map((mood)=> {return {tag: {tag: mood}}}), ageRating: '' }
+        }
     })
     .catch((error)=>console.log(error));
     return  book;

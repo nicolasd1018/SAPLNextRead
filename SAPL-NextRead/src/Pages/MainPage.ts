@@ -113,7 +113,7 @@ export class MainPage extends HTMLElement {
                     // get book recommendations from Hardcover
                     loadingScreen!.style.display = 'flex';
                     const searchedBook: book = await getBook(searchBar.value) as unknown as book;
-                    this.#books = await getRecommendations(searchBar.value, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter);
+                    this.#books = await getRecommendations(searchedBook.title, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter);
                     // filter out all the duplicates
                     if (this.#books.length > 0) {
                         this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
@@ -123,7 +123,6 @@ export class MainPage extends HTMLElement {
 
                         this.filterBooks();
                         
-                        console.log(this.#books);
                         this.fillBookCarousel(this.#books, bookSpace!, x);
                         if (bookSpace && bookSpace instanceof HTMLElement)
                         {
