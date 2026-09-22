@@ -77,6 +77,7 @@ ipcMain.handle('make-user', async (event, username: string, password?: string) =
         const createBookList = db.prepare('INSERT INTO bookLists (user_id, name) VALUES (?,?)');
         createBookList.run(userId, 'Liked Books');
         createBookList.run(userId, 'Disliked Books');
+        return user.lastInsertRowid;
     } catch (error) {
         console.error("Database query make-user failed:", error);
         throw error;

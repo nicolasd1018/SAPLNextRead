@@ -177,25 +177,25 @@ export const getBook = async (title: string) => {
     .query({
         query: gql`
         query MySearchQuery {
-  search(
-    query: "${title}"
-    query_type: "Book"
-    per_page: 1
-    sort: "activities_count:desc"
-  ) {
-    results
-  }
-}
+            search(
+                query: "${title}"
+                query_type: "Book"
+                per_page: 1
+                sort: "activities_count:desc"
+            ) {
+                results
+            }
+        }
     `,
         errorPolicy: 'all'
     }).then((result) => { 
         if ((result.data as {search: {results: {hits: {document: {}}[]}}}).search.results.hits.length === 0) {
             book = undefined;
-            console.log('test');
         }
         else {
          const searchResult = (result.data as {search: {results: {hits: {document: {id: number, image: {url: string}, title: string, contributions: {author: {name:string, is_bipoc: boolean, is_lgbtq: boolean}}[], description: string, subtitle: string, featured_series: {position: number, series: {primary_books_count: number, name: string }}, genres:string[], content_warnings: string[], moods: string[]}}[]}}}).search.results.hits[0].document;
-         book = {...searchResult, book_series: searchResult.featured_series.series ? [{position: searchResult.featured_series.position, series: {name: searchResult.featured_series.series.name, books_count: searchResult.featured_series.series.primary_books_count}}] : [], genres: searchResult.genres.map((genre)=> {return {tag: {tag: genre}}}), contentWarnings: searchResult.content_warnings.map((contentWarning)=> {return {tag: {tag: contentWarning}}}), moods: searchResult.moods.map((mood)=> {return {tag: {tag: mood}}}), ageRating: '' }
+         book = {...searchResult, book_series: searchResult.featured_series.series ? [{position: searchResult.featured_series.position, series: {name: searchResult.featured_series.series.name, books_count: searchResult.featured_series.series.primary_books_count}}] : [], genres: searchResult.genres.map((genre)=> {return {tag: {tag: genre}}}), contentWarnings: searchResult.content_warnings.map((contentWarning)=> {return {tag: {tag: contentWarning}}}), moods: searchResult.moods.map((mood)=> {return {tag: {tag: mood}}}), ageRating: '' };
+
         }
     })
     .catch((error)=>console.log(error));

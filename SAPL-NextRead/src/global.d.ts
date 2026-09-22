@@ -9,7 +9,7 @@ declare global {
       runAgeFinder: (title: string, subtitle) => Promise<string[]>;
     };
     api: {
-      addUser: (username: string, password?: string) => Promise<void>;
+      addUser: (username: string, password?: string) => Promise<number>;
       getUsers: () => Promise<User[]>;
       getPassword: (id: number) => Promise<string>;
       getUser: (id: number) => Promise<User>;

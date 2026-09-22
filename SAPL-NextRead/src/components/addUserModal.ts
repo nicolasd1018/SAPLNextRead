@@ -33,11 +33,11 @@ export default class AddUserModal extends HTMLElement{
             }
 
             if (createUserButton && usernameInput) {
-                createUserButton.addEventListener('click', ()=>{
-                    window.api.addUser(usernameInput.value, (passwordInput.value ?? undefined));
+                createUserButton.addEventListener('click', async ()=>{
+                    const id = await window.api.addUser(usernameInput.value, (passwordInput.value ?? undefined));
                     usernameInput.value = '';
                     this.style.display = 'none';
-                    this.dispatchEvent(new CustomEvent('create-new-user'));
+                    this.dispatchEvent(new CustomEvent('create-new-user', {detail: {id: id}}));
                 })
             }
 

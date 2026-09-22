@@ -50,9 +50,13 @@ export default class AccountSelectionPage extends HTMLElement {
                 createUserButton.addEventListener('click', () => {
                     addUserModal.style.display = 'inline';
                 });
-                addUserModal.addEventListener('create-new-user', async () => {
-                    await this.render();
-                })
+                addUserModal.addEventListener('create-new-user', async (event) => {
+                    const id = (event as CustomEvent).detail.id;
+                    console.log(id)
+                    const user = await window.api.getUser(id);
+                    console.log('test');
+                    changePage(user);
+                });
             }
 
             const userPics = this.shadowRoot.querySelectorAll('.user-button');
