@@ -31,6 +31,7 @@ import './Pages/MainPage'
 import './Pages/BookPage'
 import './components/Header'
 import './Pages/AccountSelectionPage'
+import './Pages/AuthorPage';
 import { book as Book } from './API/HardcoverAPI';
 import { MainPage } from './Pages/MainPage';
 import { USBDevice } from 'electron';
@@ -38,6 +39,8 @@ import UseState from './Types/UseState';
 import BookPage from './Pages/BookPage';
 import User from './Types/User';
 import Header from './components/Header';
+import Author from './Types/Author';
+import AuthorPage from './Pages/AuthorPage';
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
@@ -45,10 +48,11 @@ console.log(
 
 const mainPage = document.createElement('main-page');
 const bookPage = document.createElement('book-page');
+const authorPage = document.createElement('author-page');
 const header = document.createElement('nextread-header');
 const accountSelectionPage = document.createElement('account-selection-page')
 
-export const changePage = (user?: User, book?: Book, logout: boolean = false) => {
+export const changePage = (user?: User, book?: Book, author?: Author, logout: boolean = false) => {
   if (book) {
     mainPage.style.display = 'none';
     bookPage.setAttribute('imgUrl', book.image.url);
@@ -76,8 +80,16 @@ export const changePage = (user?: User, book?: Book, logout: boolean = false) =>
     document.body.removeChild(mainPage);
     document.body.appendChild(accountSelectionPage);
   }
+  if (author) {
+    mainPage.style.display = 'none';
+    if (document.body.contains(bookPage)) document.body.removeChild(bookPage);
+    (authorPage as AuthorPage).author = author;
+    document.body.appendChild(authorPage);
+  }
   else {
-    document.body.removeChild(bookPage);
+    if (document.body.contains(bookPage)) document.body.removeChild(bookPage);
+    if (document.body.contains(authorPage)) document.body.removeChild(authorPage);
+
     mainPage.style.display = 'block';
   }
 }

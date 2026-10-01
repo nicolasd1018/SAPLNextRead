@@ -49,7 +49,7 @@ class Header extends HTMLElement {
                 {
                     menu.addEventListener('change', (event) => {
                         if ((event.target as HTMLSelectElement).value === 'Logout') {
-                            changePage(undefined, undefined, true);
+                            changePage(undefined, undefined, undefined,  true);
                         }
                     })
                 }

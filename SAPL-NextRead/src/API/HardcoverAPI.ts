@@ -2,6 +2,7 @@ import { ApolloClient, HttpLink, InMemoryCache, gql } from "@apollo/client";
 import { SetContextLink } from "@apollo/client/link/context";
 import { re } from "mathjs";
 import Tag from "../Types/Tag";
+import Author from "../Types/Author";
 
 const authLink = new SetContextLink(({ headers }) => {
   return {
@@ -35,7 +36,7 @@ export interface book {
     ageRating: string
 }
 
-export const getListBooks = async (bookList: string[], bannedBooks: string[], bipocFilter: boolean, lgbtqFilter:boolean, iteration?: number) => {
+export const getListBooks = async (bookList: string[], bannedBooks: string[], bipocFilter: boolean, lgbtqFilter:boolean, iteration?: number): Promise<book[]> => {
     var reccomendation: book[] =  [];
     let list = '';
     let bannedList = ''
@@ -171,7 +172,8 @@ export const getAuthorBooks = async (author: string, bipocFilter: boolean, lgbtq
     return  reccomendation;
 }
 
-export const getBook = async (title: string) => {
+
+export const getBook = async (title: string): Promise<book | undefined> => {
     let book: book | undefined = undefined;
     await client
     .query({
@@ -200,6 +202,42 @@ export const getBook = async (title: string) => {
     })
     .catch((error)=>console.log(error));
     return  book;
+}
+
+export const getAuthor = async (author: string): Promise<Author | undefined> => {
+    const book:book|undefined = await getBook(author);
+    let authorProfile = undefined;
+    console.log(book)
+    if (book) {
+        const authorName = book.contributions[0].author.name;
+        await client
+    .query({
+        query: gql`
+            query MyQuery {
+  authors(where: {name: {_eq: "Ursula K. Le Guin"}}) {
+    name
+    born_date
+    death_date
+    alternate_names
+    location
+    title
+    bio
+    books_count
+    is_bipoc
+    is_lgbtq
+    image{
+      url
+    }
+  }
+}
+        `}).then((result) => { 
+        if ((result.data).authors.length !==0 ) {
+            authorProfile = result.data.authors[0];
+        }
+    })
+    .catch((error)=>console.log(error));;
+    }
+    return authorProfile;
 }
 
 export const getRecommendations = async (title: string, bipocFilter: boolean, lgbtqFilter:boolean, iteration?: number): Promise<book[]>=> {

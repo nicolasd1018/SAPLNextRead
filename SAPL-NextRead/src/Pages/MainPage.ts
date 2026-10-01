@@ -1,5 +1,5 @@
 import templateString from '../Pages/MainPage.template.html?raw';
-import { book, getAuthorBooks, getBook, getListBooks, getRecommendations } from '../API/HardcoverAPI';
+import { book, getAuthor, getAuthorBooks, getBook, getListBooks, getRecommendations } from '../API/HardcoverAPI';
 import '../components/Searchbar.js'; 
 import { changePage } from '../renderer';
 import '../components/LoadingScreen';
@@ -10,6 +10,7 @@ import Tag from '../Types/Tag';
 import FilterModal from '../components/FilterModal';
 import User from '../Types/User';
 import Searchbar from '../components/Searchbar.js';
+import Author from '../Types/Author';
 
 
 
@@ -103,6 +104,7 @@ export class MainPage extends HTMLElement {
         const bookTitle = this.shadowRoot.getElementById('book-title');
         const searchedCover = this.shadowRoot.getElementById('searched-cover') as HTMLImageElement | undefined;
         const bookslike = this.shadowRoot.getElementById('books-like');
+        const bookslikeHelperText = this.shadowRoot.getElementById('helper-text');
         let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');;
         let x = -1;
         let iteration = 0;
@@ -195,16 +197,34 @@ export class MainPage extends HTMLElement {
                             }
                         }
 
-                        if (bookTitle && searchedBook && searchedCover && bookslike) {
-                            bookslike.style.display = 'flex';
-                            bookTitle.textContent = searchedBook.title;
-                            bookTitle.addEventListener(('click'), () => {
-                                changePage(undefined, searchedBook);
-                            });
-                            searchedCover.src = searchedBook.image.url;
-                            searchedCover.addEventListener('click', () => {
-                                changePage(undefined, searchedBook);
-                            });
+                        if (bookTitle && searchedCover && bookslike && bookslikeHelperText) {
+                            if ((search as Searchbar).mode === 'book' && searchedBook) { 
+                                bookslikeHelperText.innerText = "Books like";
+                                bookslike.style.display = 'flex';
+                                bookTitle.textContent = searchedBook.title;
+                                bookTitle.addEventListener(('click'), () => {
+                                    changePage(undefined, searchedBook);
+                                });
+                                searchedCover.src = searchedBook.image.url;
+                                searchedCover.addEventListener('click', () => {
+                                    changePage(undefined, searchedBook);
+                                });
+                            }
+                            else if (((search as Searchbar).mode === 'author')) {
+                                console.log('test');
+                                const searchedAuthor: Author|undefined = await getAuthor(searchBar.value);
+                                console.log(searchedAuthor);
+                                bookslikeHelperText.innerText = "Books like those by ";
+                                bookslike.style.display = 'flex';
+                                bookTitle.textContent = (searchedAuthor!.title ?? '')+searchedAuthor!.name;
+                                bookTitle.addEventListener(('click'), () => {
+                                    changePage(undefined, undefined, searchedAuthor);
+                                });
+                                searchedCover.src = searchedAuthor!.image.url;
+                                searchedCover.addEventListener('click', () => {
+                                    changePage(undefined, undefined, searchedAuthor);
+                                });
+                            }
                         }
                     }
                     else if (errorModal && errorModal instanceof HTMLElement){
