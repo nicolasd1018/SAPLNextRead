@@ -40,7 +40,7 @@ export const getListBooks = async (bookList: string[], bannedBooks: string[], bi
     var reccomendation: book[] =  [];
     let list = '';
     let bannedList = ''
-    
+    console.log(bookList);
     bookList.forEach((book) => { 
                                     list += `{title: {_eq: "${book}"}},`;
                                     bannedList += `{book: {title: {_neq: "${book}"}}},`;
@@ -137,38 +137,88 @@ export const getListBooks = async (bookList: string[], bannedBooks: string[], bi
     return  reccomendation;
 }
 
-export const getAuthorBooks = async (author: string, bipocFilter: boolean, lgbtqFilter:boolean, iteration?: number) => {
-    let searchBooks: book[] = [];
+export const getAuthorBooks = async (author: string) => {
+    let reccomendation: book[] = [];
+    const authorProfile = await getAuthor(author);
+    console.log(authorProfile?.name ?? '');
     await client
     .query({
         query: gql`
-        query MySearchQuery {
-  search(
-    query: "${author}"
-    query_type: "Book"
-    per_page: 5
-    sort: "activities_count:desc"
-  ) {
-    results
-  }
-}
+        fragment cover on books
+        {
+        image {
+                            url
+                }
+        }
+
+        fragment information on books{
+        id
+        title
+        subtitle
+        contributions{author
+            {name
+            is_bipoc
+            is_lgbtq
+            }}
+        description
+        book_series {
+            position
+            series {
+            name
+            books_count
+            }
+        }
+        }
+
+        fragment genres on books{
+        genres: taggable_counts(where: {tag: {tag_category_id: {_eq: 1}}}order_by: {count: desc_nulls_last} limit: 5){
+                tag{
+                    tag
+                }
+            }
+        }
+
+        fragment contentWarnings on books {
+        contentWarnings: taggable_counts(where: {tag: {tag_category_id: {_eq: 3}}}order_by: {count: desc_nulls_last}){
+                tag{
+                    tag
+                }
+            }
+        }
+
+        fragment moods on books{
+            moods: taggable_counts(where: {tag: {tag_category_id: {_eq: 4}}}order_by: {count: desc_nulls_last} limit: 5){
+                tag{
+                    tag
+                }
+            }
+        }
+
+        query MyQuery {
+            books(
+                where: {contributions: {author: {name: {_eq: "${authorProfile?.name ?? ''}"}}}}
+                order_by: {activities_count: desc_nulls_last}
+            )
+            {
+                        ...cover
+                        ...information
+                        ...genres
+                        ...contentWarnings
+                        ...moods
+                    
+            }
+    }
     `,
         errorPolicy: 'all'
     }).then((result) => { 
-        if ((result.data as {search: {results: {hits: {document: {}}[]}}}).search.results.hits.length === 0) {
-            searchBooks = [];
+        console.log(result);
+        if ((result.data).books.length ===0 ) {
+            reccomendation = []
         }
-        else {
-         const searchResults = (result.data as {search: {results: {hits: {document: {id: number, image: {url: string}, title: string, contributions: {author: {name:string, is_bipoc: boolean, is_lgbtq: boolean}}[], description: string, subtitle: string, featured_series: {position: number, series: {primary_books_count: number, name: string }}, genres:string[], content_warnings: string[], moods: string[]}}[]}}}).search.results.hits;
-         searchResults.forEach((hit)=> {
-            const searchResult = hit.document;
-            searchBooks = [...searchBooks, {...searchResult, book_series: searchResult.featured_series.series ? [{position: searchResult.featured_series.position, series: {name: searchResult.featured_series.series.name, books_count: searchResult.featured_series.series.primary_books_count}}] : [], genres: searchResult.genres.map((genre)=> {return {tag: {tag: genre}}}), contentWarnings: searchResult.content_warnings.map((contentWarning)=> {return {tag: {tag: contentWarning}}}), moods: searchResult.moods.map((mood)=> {return {tag: {tag: mood}}}), ageRating: '' }];
-        });
-        
-        }
+        else
+         reccomendation = result.data.books;
     })
     .catch((error)=>console.log(error));
-    const reccomendation = await getListBooks(searchBooks.map((book)=> book.title), [], bipocFilter, lgbtqFilter, iteration )
     return  reccomendation;
 }
 

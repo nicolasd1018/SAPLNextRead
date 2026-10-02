@@ -89,6 +89,34 @@
     #searched-cover:hover {
         cursor: pointer;
     }
+    #authored-books {
+        overflow-y: auto; 
+        display: none;
+        flex-direction: column;
+        height: 100px;
+        width: 500px;
+        justify-self: center;
+    }
+    #authored-books div {
+    display: inline-block; 
+    text-align: center;
+    text-decoration: none;     /* Removes underlines */
+    }
+    #books-like-holder{
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+    }
+    #author-submit{
+        border:  2px #602983 solid;
+        background-color: #602983;
+        color: white;
+        display: none;
+    }
+    #author-submit:hover{
+        cursor: pointer;
+    }
 </style>
 
 <error-modal id="error-modal"></error-modal>
@@ -99,10 +127,15 @@
         <nextread-searchbar></nextread-searchbar>
         <button id="filter-button">Filter</button>
     </div>
-    <div id="books-like">
-        <div id="helper-text">Books like</div>
-        <div id="book-title"></div>
-        <img id="searched-cover">
+    <div id="books-like-holder">
+        <div id="books-like">
+            <div id="helper-text">Books like</div>
+            <div id="book-title"></div>
+            <img id="searched-cover">
+        </div>
+        <div id="authored-books">
+        </div>
+        <button id="author-submit">Submit</button>
     </div>
     <div id="book-carousel">
          <img id="left-arrow" src="/Arrow.png" />

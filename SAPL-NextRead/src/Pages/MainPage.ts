@@ -105,10 +105,15 @@ export class MainPage extends HTMLElement {
         const searchedCover = this.shadowRoot.getElementById('searched-cover') as HTMLImageElement | undefined;
         const bookslike = this.shadowRoot.getElementById('books-like');
         const bookslikeHelperText = this.shadowRoot.getElementById('helper-text');
+        const authorBookSearch = this.shadowRoot.getElementById('authored-books') as HTMLElement | undefined;
+        const BookCarousel = this.shadowRoot.getElementById('book-carousel') as HTMLElement | undefined;
+        const authorSubmitBtn = this.shadowRoot.getElementById('author-submit') as HTMLButtonElement | undefined;
         let bookCovers: NodeListOf<Element> = document.querySelectorAll(':not(*)');;
         let x = -1;
         let iteration = 0;
         let searchedBook: book;
+        let authoredBooks: book[];
+        let authorSearchList: book[] = [];
 
         if (searchBar && search && searchBar instanceof HTMLInputElement) {
             search?.addEventListener('change-search-criteria', async ()=>{
@@ -165,7 +170,9 @@ export class MainPage extends HTMLElement {
                     // get book recommendations from Hardcover
                     loadingScreen!.style.display = 'flex';
                     if ((search as Searchbar).mode === 'author') {
-                        this.#books = await getAuthorBooks(searchBar.value, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter);
+                        authoredBooks = await getAuthorBooks(searchBar.value);
+                        authorSearchList = authoredBooks.slice(0,5);
+                        this.#books = await getListBooks(authorSearchList.map((book) => book.title),[],this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
                     }
                     else {
                         searchedBook = await getBook(searchBar.value) as unknown as book;
@@ -202,6 +209,8 @@ export class MainPage extends HTMLElement {
                                 bookslikeHelperText.innerText = "Books like";
                                 bookslike.style.display = 'flex';
                                 bookTitle.textContent = searchedBook.title;
+                                authorBookSearch!.style.display = 'none';
+                                BookCarousel!.style.top = '55%';
                                 bookTitle.addEventListener(('click'), () => {
                                     changePage(undefined, searchedBook);
                                 });
@@ -210,10 +219,9 @@ export class MainPage extends HTMLElement {
                                     changePage(undefined, searchedBook);
                                 });
                             }
-                            else if (((search as Searchbar).mode === 'author')) {
-                                console.log('test');
+                            else if (((search as Searchbar).mode === 'author') && authorBookSearch) {
+                                console.log('test')
                                 const searchedAuthor: Author|undefined = await getAuthor(searchBar.value);
-                                console.log(searchedAuthor);
                                 bookslikeHelperText.innerText = "Books like those by ";
                                 bookslike.style.display = 'flex';
                                 bookTitle.textContent = (searchedAuthor!.title ?? '')+searchedAuthor!.name;
@@ -224,6 +232,83 @@ export class MainPage extends HTMLElement {
                                 searchedCover.addEventListener('click', () => {
                                     changePage(undefined, undefined, searchedAuthor);
                                 });
+                                authorBookSearch.style.display = 'flex';
+                                authorBookSearch.innerHTML = '';
+                                authorSubmitBtn!.style.display = 'flex';
+                                authorSubmitBtn?.addEventListener('click', async ()=>{
+                                    loadingScreen!.style.display = 'flex';
+                                    console.log(authorSearchList);
+                                    this.#books = await getListBooks(authorSearchList.map((book) => book.title),[],this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
+                                    if (this.#books.length > 0) {
+                                    this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
+                                
+                                    // check to see if books are available in SAPL catalogue and filter out the ones that aren't
+                                    this.#books = await this.availabilityCheck(this.#books);
+
+                                    this.filterBooks();
+                                    
+                                    this.fillBookCarousel(this.#books, bookSpace!, x);
+                                    if (bookSpace && bookSpace instanceof HTMLElement)
+                                    {
+                                        bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
+                                        if (bookCovers) {
+                                            bookCovers.forEach((bc)=> {
+                                                const bookIndex = Number(bc.getAttribute('data-book-index'));
+                                                if (bookIndex >= 0){
+                                                    bc.addEventListener("click", async (event) => {
+                                                        changePage(undefined, this.#books[bookIndex])
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    }
+
+                                    if (bookTitle && searchedBook && searchedCover && bookslike) {
+                                        bookslike.style.display = 'flex';
+                                        bookTitle.textContent = searchedBook.title;
+                                        bookTitle.addEventListener(('click'), () => {
+                                            changePage(undefined, searchedBook);
+                                        });
+                                        searchedCover.src = searchedBook.image.url;
+                                        searchedCover.addEventListener('click', () => {
+                                            changePage(undefined, searchedBook);
+                                        });
+                                    }
+                                    }
+                                    else if (errorModal && errorModal instanceof HTMLElement){
+                                        errorModal.setAttribute('error-title', 'Search Input Error');
+                                        errorModal.setAttribute('error-message', 'There has been an error finding books like the one  entered. The most likely explanation is that the title was input incorrectly. Please try again with the exact title, including exact capitalization, punctuation, and spacing.');
+                                        (errorModal as ErrorModal).addInformation();
+                                        errorModal.style.display = 'flex';
+                                        
+                                    }
+                                    loadingScreen!.style.display = 'none';
+                                });
+                                authoredBooks.forEach((book, index) => {
+                                    const row = document.createElement('div');
+                                    row.style.display = 'flex';
+                                    row.style.flexDirection = 'row'
+                                    const bookTitle = document.createElement('div');
+                                    bookTitle.innerText = book.title;
+                                    const checkbox = document.createElement('input');
+                                    checkbox.type = 'checkbox';
+                                    checkbox.value = book.title;
+                                    checkbox.addEventListener('change',()=>{
+                                        if (!checkbox.checked) {
+                                            authorSearchList = authorSearchList.filter((book)=> book.title !== checkbox.value);
+                                        }
+                                        else {
+                                            authorSearchList = [...authorSearchList, authoredBooks.find((book) => book.title === checkbox.value)!];
+                                        }
+                                        
+                                    })
+                                    if (index < 5)
+                                        checkbox.checked = true;
+                                    row.appendChild(bookTitle);
+                                    row.appendChild(checkbox);
+                                    authorBookSearch.appendChild(row);
+                                    BookCarousel!.style.top = '68%';
+                                })
                             }
                         }
                     }
@@ -245,11 +330,11 @@ export class MainPage extends HTMLElement {
                 if (x >= this.#books.length -3){
                     iteration += 1;
                     loadingScreen!.style.display = 'flex';
-                    let newBooks = []
+                    let newBooks = [];
                     if ((search as Searchbar).mode === 'author') {
-                        newBooks = await getAuthorBooks((searchBar as HTMLInputElement)!.value, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
+                        newBooks = await getListBooks(authorSearchList.map((book) => book.title),[],this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
                     }
-                    if ((search as Searchbar).mode === 'like-dislike'){
+                    else if ((search as Searchbar).mode === 'like-dislike'){
                         newBooks = await getListBooks(this.user!.searchLists.find((list) => list.name = 'Liked Books')!.books, this.user!.searchLists.find((list) => list.name = 'Disliked Books')!.books,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
                     }
                     else {
