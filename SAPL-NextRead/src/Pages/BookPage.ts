@@ -1,6 +1,8 @@
 import { add } from 'mathjs';
 import templateString from '../Pages/BookPage.template.html?raw';
 import User from '../Types/User';
+import { changePage } from '../renderer';
+import { getAuthor } from '../API/HardcoverAPI';
 
 class BookPage extends HTMLElement {
     private _bookSeries:{position: number, series: {name: string, books_count: number}}[] = [];
@@ -64,7 +66,11 @@ class BookPage extends HTMLElement {
             }
 
             if (author && authorText && authorText instanceof HTMLElement){
-                authorText.innerHTML = `By ${author}`;
+                authorText.innerHTML = `${author}`;
+                authorText.addEventListener('click', async () => {
+                    const authorProfile = await getAuthor(author, true);
+                    changePage(undefined, undefined, authorProfile);
+                })
             }
 
             if (description && descriptionText && descriptionText instanceof HTMLElement){

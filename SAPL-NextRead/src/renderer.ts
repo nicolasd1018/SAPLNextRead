@@ -54,6 +54,7 @@ const accountSelectionPage = document.createElement('account-selection-page')
 
 export const changePage = (user?: User, book?: Book, author?: Author, logout: boolean = false) => {
   if (book) {
+    console.log('test');
     mainPage.style.display = 'none';
     bookPage.setAttribute('imgUrl', book.image.url);
     bookPage.setAttribute('bookTitle', book.title);
@@ -80,7 +81,7 @@ export const changePage = (user?: User, book?: Book, author?: Author, logout: bo
     document.body.removeChild(mainPage);
     document.body.appendChild(accountSelectionPage);
   }
-  if (author) {
+  else if (author) {
     mainPage.style.display = 'none';
     if (document.body.contains(bookPage)) document.body.removeChild(bookPage);
     (authorPage as AuthorPage).author = author;

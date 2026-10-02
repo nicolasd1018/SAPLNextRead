@@ -204,17 +204,19 @@ export const getBook = async (title: string): Promise<book | undefined> => {
     return  book;
 }
 
-export const getAuthor = async (author: string): Promise<Author | undefined> => {
-    const book:book|undefined = await getBook(author);
+export const getAuthor = async (author: string, exactSearch: boolean = false): Promise<Author | undefined> => {
+    if (!exactSearch) {
+        const book:book|undefined = await getBook(author);
+        if (book) 
+         author = book.contributions[0].author.name;
+    }
     let authorProfile = undefined;
-    console.log(book)
-    if (book) {
-        const authorName = book.contributions[0].author.name;
+    
         await client
     .query({
         query: gql`
             query MyQuery {
-  authors(where: {name: {_eq: "Ursula K. Le Guin"}}) {
+  authors(where: {name: {_eq: "${author}"}}, order_by: {books_count: desc}) {
     name
     born_date
     death_date
@@ -236,7 +238,6 @@ export const getAuthor = async (author: string): Promise<Author | undefined> => 
         }
     })
     .catch((error)=>console.log(error));;
-    }
     return authorProfile;
 }
 

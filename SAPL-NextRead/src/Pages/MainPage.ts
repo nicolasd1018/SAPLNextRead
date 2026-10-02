@@ -220,7 +220,7 @@ export class MainPage extends HTMLElement {
                                 bookTitle.addEventListener(('click'), () => {
                                     changePage(undefined, undefined, searchedAuthor);
                                 });
-                                searchedCover.src = searchedAuthor!.image.url;
+                                searchedCover.src = searchedAuthor!.image === null ? '' : searchedAuthor!.image.url;
                                 searchedCover.addEventListener('click', () => {
                                     changePage(undefined, undefined, searchedAuthor);
                                 });
