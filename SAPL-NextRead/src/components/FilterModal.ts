@@ -70,15 +70,18 @@ export default class FilterModal extends HTMLElement{
 
             if (tagSpace) {
                 tagSpace.addEventListener('set-filter', (event)=>{
+                    console.log(event.detail);
                     this.user.useState ={whiteList: (event as CustomEvent).detail.whiteList, blackList:(event as CustomEvent).detail.blackList, ageRange: (event as CustomEvent).detail.ageRange, bipocFilter: (event as CustomEvent).detail.bipocFilter, lgbtqFilter: (event as CustomEvent).detail.lgbtqFilter};
                 });
                 (tagSpace as TagMenu).setWhiteList('genre', this.user.useState.whiteList.filter((tag)=> tag.type === 'genre').map((tag)=> tag.name));
                 (tagSpace as TagMenu).setWhiteList('mood', this.user.useState.whiteList.filter((tag)=> tag.type === 'mood').map((tag)=> tag.name));
                 (tagSpace as TagMenu).setWhiteList('content-warning', this.user.useState.whiteList.filter((tag)=> tag.type === 'content-warning').map((tag)=> tag.name));
+                (tagSpace as TagMenu).setWhiteList('publisher', this.user.useState.whiteList.filter((tag)=> tag.type === 'publisher').map((tag)=> tag.name));
 
                 (tagSpace as TagMenu).setBlackList('genre', this.user.useState.blackList.filter((tag)=> tag.type === 'genre').map((tag)=> tag.name));
                 (tagSpace as TagMenu).setBlackList('mood', this.user.useState.blackList.filter((tag)=> tag.type === 'mood').map((tag)=> tag.name));
                 (tagSpace as TagMenu).setBlackList('content-warning', this.user.useState.blackList.filter((tag)=> tag.type === 'content-warning').map((tag)=> tag.name));
+                (tagSpace as TagMenu).setBlackList('publisher', this.user.useState.whiteList.filter((tag)=> tag.type === 'publisher').map((tag)=> tag.name));
 
                 const ages = ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'];
                 console.log(ages.findIndex((age)=> age=== this.user.useState.ageRange[0]));

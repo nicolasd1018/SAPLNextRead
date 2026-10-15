@@ -292,8 +292,21 @@ export const getAuthor = async (author: string, exactSearch: boolean = false): P
     return authorProfile;
 }
 
-export const getRecommendations = async (title: string, bipocFilter: boolean, lgbtqFilter:boolean, iteration?: number): Promise<book[]>=> {
+export const getRecommendations = async (title: string, bipocFilter: boolean, lgbtqFilter:boolean, publisherWhiteList: string[], publisherBlackList: string[], iteration?: number): Promise<book[]>=> {
     var reccomendation: book[] =  [];
+    console.log(publisherWhiteList);
+    let allowedPublishers = `{_or: [`;
+    publisherWhiteList.forEach((pub) => {
+        allowedPublishers += `{editions: {publisher: {name: {_eq: "${pub}"}}}},`
+    });
+    allowedPublishers += `]}`
+
+    let bannedPublishers = `{_or: [`;
+    publisherBlackList.forEach((pub) => {
+        bannedPublishers += `{editions: {publisher: {name: {_neq: "${pub}"}}}},`
+    });
+    bannedPublishers += `]}`
+    console.log(allowedPublishers);
     await client
     .query({
         query: gql`
@@ -348,7 +361,7 @@ export const getRecommendations = async (title: string, bipocFilter: boolean, lg
         }
 
         query MyQuery {
-            books (where: {_and: [{title: {_eq: "${title}"}}, {users_read_count: {_gt: 0}}]})
+            books (where: {_and: [{title: {_eq: "${title}"}}, {users_read_count: {_gt: 0}} ${publisherWhiteList.length > 0 ? `,${allowedPublishers}`: ''} ${publisherBlackList.length > 0 ? `,${bannedPublishers}`: ''}]})
             {
                 user_books (where: {rating: {_gte: 4}}
                             ${iteration ? `offset: ${10* iteration}` : ''} limit: 10){
@@ -426,9 +439,9 @@ export const getAllPublishers = async (iteration: number = 0): Promise<Publisher
     .query({
         query: gql`
         query MyQuery {
-        publishers {
+        publishers (order_by: {editions_count: desc_nulls_last} offset:${50*iteration} limit: 50 ) {
             name
-            editions {
+            editions  {
                     book {
                         id
                     }

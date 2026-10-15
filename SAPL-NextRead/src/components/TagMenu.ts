@@ -75,7 +75,7 @@ class TagMenu extends HTMLElement {
     whiteListTags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []], ['publisher', []]]);
     blackListTags:  Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []], ['publisher', []]]);
     tagType: string = 'genre';
-    tagIndexes= new Map([['genre', 0], ['mood', 0], ['content-warning',0]]);
+    tagIndexes= new Map([['genre', 0], ['mood', 0], ['content-warning',0], ['publisher', 0]]);
     tags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []], ['publisher', []]]);
     ages = ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'];
     initialMin = 0
@@ -126,7 +126,6 @@ class TagMenu extends HTMLElement {
             if (whiteList && whiteList instanceof HTMLElement && blackList && blackList instanceof HTMLElement) {
                 whiteList.innerHTML = '';
                 blackList.innerHTML = '';
-                console.log(this.tagType, tags);
                 tags.forEach((tag, index)=> {
                     const whiteGenreTag = document.createElement('div');
                     whiteGenreTag.id = `genre-tag-${index}`;
@@ -144,7 +143,8 @@ class TagMenu extends HTMLElement {
                         else {
                             this.whiteListTags.set(this.tagType, [...this.whiteListTags.get(this.tagType)!, tag]);
                         }
-                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));
+                        console.log(this.whiteListTags);
+                        this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags).flatMap(([key, values]) => values.map((value) => ({ name: value, type: key } as Tag))), blackList:Array.from(this.blackListTags).flatMap(([key, values]) => values.map((value) => ({ name: value, type: key } as Tag))), ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));
                     });
                     
                     const blackGenreTag = document.createElement('div');
@@ -160,7 +160,7 @@ class TagMenu extends HTMLElement {
                             this.blackListTags.set(this.tagType,this.blackListTags.get(this.tagType)!.filter((bTag) => bTag !== tag));
                         }
                         else {
-                            this.blackListTags.set(this.tagType,[...this.whiteListTags.get(this.tagType)!, tag]);
+                            this.blackListTags.set(this.tagType,[...this.blackListTags.get(this.tagType)!, tag]);
                         }
                         this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], blackList:Array.from(this.blackListTags, ([key, values]) =>(values.map((value)=>({name: value, type: key} as Tag))))[0], ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));
                     });
@@ -174,7 +174,6 @@ class TagMenu extends HTMLElement {
 
     async getTags(index: number = 0){
         const tagType = this.getAttribute('tag-type');
-        console.log(tagType);
         var tags: string[] = [];
         if (tagType && tagType === 'genre')
                 tags = await getAllGenres(index);
@@ -185,7 +184,6 @@ class TagMenu extends HTMLElement {
         if (tagType && tagType === 'publisher') {
             const publishers = await getAllPublishers(index);
             tags = publishers.map((pub) => pub.name);
-            console.log(tags);
         }
         return tags;
     }
@@ -239,6 +237,7 @@ class TagMenu extends HTMLElement {
                         if (Math.abs(distanceToBottom) <= 1) {
                             var newTags: string[] = [];
                             this.tagIndexes.set(this.tagType, this.tagIndexes.get(this.tagType)!+1);
+                            console.log(this.tagIndexes.get(this.tagType));
                             newTags = await this.getTags(this.tagIndexes.get(this.tagType));
                             this.tags.set(this.tagType, [...this.tags.get(this.tagType)!,...newTags]);
                             this.createTags(this.tags.get(this.tagType)!.filter((tag) => tag.includes((searchBar as HTMLInputElement)!.value)));
@@ -272,9 +271,7 @@ class TagMenu extends HTMLElement {
                 const bipocBox = this.shadowRoot.querySelector('#bipoc-filter') as HTMLInputElement;
 
                 fromSlider.value = `${this.initialMin}`;
-                console.log(toSlider.value);
                 toSlider.value = `${this.initialMax}`;
-                console.log(this.initialMax, toSlider.value);
 
                 this.fillSlider(fromSlider, toSlider, '#C6C6C6', '#602983', toSlider);
                 this.setToggleAccessible(toSlider);
