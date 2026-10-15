@@ -1,5 +1,5 @@
 import { first, from } from 'rxjs';
-import { getAllContentWarnings, getAllGenres, getAllMoods } from '../API/HardcoverAPI';
+import { getAllContentWarnings, getAllGenres, getAllMoods, getAllPublishers } from '../API/HardcoverAPI';
 import templateString from '../components/TagMenu.template.html?raw'
 import Tag from '../Types/Tag';
 
@@ -72,11 +72,11 @@ class TagMenu extends HTMLElement {
         }
     }
 
-    whiteListTags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
-    blackListTags:  Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
+    whiteListTags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []], ['publisher', []]]);
+    blackListTags:  Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []], ['publisher', []]]);
     tagType: string = 'genre';
     tagIndexes= new Map([['genre', 0], ['mood', 0], ['content-warning',0]]);
-    tags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []]]);
+    tags: Map<string,string[]> = new Map([['genre', []], ['mood', []], ['content-warning', []], ['publisher', []]]);
     ages = ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'];
     initialMin = 0
     initialMax = 4;
@@ -126,13 +126,13 @@ class TagMenu extends HTMLElement {
             if (whiteList && whiteList instanceof HTMLElement && blackList && blackList instanceof HTMLElement) {
                 whiteList.innerHTML = '';
                 blackList.innerHTML = '';
+                console.log(this.tagType, tags);
                 tags.forEach((tag, index)=> {
                     const whiteGenreTag = document.createElement('div');
                     whiteGenreTag.id = `genre-tag-${index}`;
                     whiteGenreTag.className = 'tag';
                     const firstTag = this.whiteListTags.get(this.tagType)?.[0];
                     if (this.whiteListTags.get(this.tagType)!.includes(tag)) {
-                        console.log('test');
                         whiteGenreTag.classList.toggle('selected');
                     }
                     whiteGenreTag.innerText = tag;
@@ -174,6 +174,7 @@ class TagMenu extends HTMLElement {
 
     async getTags(index: number = 0){
         const tagType = this.getAttribute('tag-type');
+        console.log(tagType);
         var tags: string[] = [];
         if (tagType && tagType === 'genre')
                 tags = await getAllGenres(index);
@@ -181,6 +182,11 @@ class TagMenu extends HTMLElement {
                 tags = await getAllContentWarnings(index);
         if (tagType && tagType === 'mood')
                 tags = await getAllMoods(index);
+        if (tagType && tagType === 'publisher') {
+            const publishers = await getAllPublishers(index);
+            tags = publishers.map((pub) => pub.name);
+            console.log(tags);
+        }
         return tags;
     }
 

@@ -3,6 +3,7 @@ import { SetContextLink } from "@apollo/client/link/context";
 import { re } from "mathjs";
 import Tag from "../Types/Tag";
 import Author from "../Types/Author";
+import { Publisher } from "../Types/Publisher";
 
 const authLink = new SetContextLink(({ headers }) => {
   return {
@@ -418,4 +419,25 @@ export const getAllMoods = async (iteration: number = 0) =>{
         }
         `, errorPolicy: 'all'}) as {data: {tags: {tag: string}[]}};
     return tags.data.tags.map((tag)=> tag.tag);
+}
+
+export const getAllPublishers = async (iteration: number = 0): Promise<Publisher[]> => {
+    let results: {data: {publishers: {name: string, editions: {book: {id: number}}[]}[]}} = await client
+    .query({
+        query: gql`
+        query MyQuery {
+        publishers {
+            name
+            editions {
+                    book {
+                        id
+                    }
+                }
+            }
+        }
+        `, errorPolicy: 'all'}) as {data: {publishers: {name: string, editions: {book: {id: number}}[]}[]}};
+        console.log(results);
+    return results.data.publishers.map((pub) => {
+        return {name:pub.name, bookIds: pub.editions.map((ed) => ed.book.id)}; 
+    });
 }

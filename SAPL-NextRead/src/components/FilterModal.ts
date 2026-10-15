@@ -56,6 +56,10 @@ export default class FilterModal extends HTMLElement{
                             this.tab = 'content-warning';
                             tagSpace.setAttribute('tag-type', 'content-warning');
                         }
+                        else if (button.id === 'publisher') {
+                            this.tab = 'publisher';
+                            tagSpace.setAttribute('tag-type', 'publisher');
+                        }
                         else if (button.id === "misc") {
                             this.tab = 'misc';
                             tagSpace.setAttribute('tag-type', 'misc');
