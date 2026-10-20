@@ -2,14 +2,10 @@ import { app, BrowserWindow, ipcMain, Options } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { PythonShell } from 'python-shell';
-import { fileURLToPath } from 'url';
 import { DatabaseSync, StatementResultingChanges } from 'node:sqlite'; 
 import User from './Types/User';
 import bcrypt from "bcryptjs";
-import UseState from './Types/UseState';
 import BookList from './Types/bookList';
-import { json } from 'node:stream/consumers';
-import { number } from 'mathjs';
 
 
 
@@ -44,7 +40,7 @@ db.exec(`
     useState_id INTEGER,
     username TEXT NOT NULL,
     password TEXT, 
-    profilePicture TEXT,
+    profilePicture BLOB,
     FOREIGN KEY (useState_id) REFERENCES useStates(id) 
   );  
 

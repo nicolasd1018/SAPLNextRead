@@ -17,6 +17,8 @@ export default class ErrorModal extends HTMLElement{
             
             if (closeButton && closeButton instanceof HTMLElement){
                 closeButton.addEventListener('click', ()=>{
+                    this.setAttribute('error-title', '');
+                    this.setAttribute('error-message', '');
                     this.style.display = 'none';
                 });
             }

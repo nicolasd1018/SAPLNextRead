@@ -32,6 +32,7 @@ import './Pages/BookPage'
 import './components/Header'
 import './Pages/AccountSelectionPage'
 import './Pages/AuthorPage';
+import './Pages/SettingsPage';
 import { book as Book } from './API/HardcoverAPI';
 import { MainPage } from './Pages/MainPage';
 import { USBDevice } from 'electron';
@@ -41,6 +42,7 @@ import User from './Types/User';
 import Header from './components/Header';
 import Author from './Types/Author';
 import AuthorPage from './Pages/AuthorPage';
+import { SettingsPage } from './Pages/SettingsPage';
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
@@ -50,9 +52,15 @@ const mainPage = document.createElement('main-page');
 const bookPage = document.createElement('book-page');
 const authorPage = document.createElement('author-page');
 const header = document.createElement('nextread-header');
-const accountSelectionPage = document.createElement('account-selection-page')
+const accountSelectionPage = document.createElement('account-selection-page');
+const settingsPage = document.createElement('settings-page');
 
-export const changePage = (user?: User, book?: Book, author?: Author, logout: boolean = false) => {
+header.addEventListener('show-profile-summary', () => {
+  mainPage.dispatchEvent(new CustomEvent('display-profile-summary'));
+});
+
+
+export const changePage = (user?: User, book?: Book, author?: Author, logout: boolean = false, settings: boolean = false) => {
   if (book) {
     console.log('test');
     mainPage.style.display = 'none';
@@ -87,6 +95,12 @@ export const changePage = (user?: User, book?: Book, author?: Author, logout: bo
     (authorPage as AuthorPage).author = author;
     document.body.appendChild(authorPage);
   }
+  else if (settings) {
+    if (document.body.contains(bookPage)) document.body.removeChild(bookPage);
+    if (document.body.contains(authorPage)) document.body.removeChild(authorPage);
+    mainPage.style.display = 'none';
+    document.body.append(settingsPage);
+  }
   else {
     if (document.body.contains(bookPage)) document.body.removeChild(bookPage);
     if (document.body.contains(authorPage)) document.body.removeChild(authorPage);
@@ -99,6 +113,7 @@ export const setUser = (user: User | undefined) => {
   (mainPage as MainPage).user = user;
   (header as Header).user = user;
   (bookPage as BookPage).user = user;
+  (settingsPage as SettingsPage).user = user;
 }
 
 

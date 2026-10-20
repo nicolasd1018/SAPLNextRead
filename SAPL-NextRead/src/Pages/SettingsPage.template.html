@@ -1,0 +1,21 @@
+<style>
+    #profile-pic-section{
+        display: flex;
+        flex-direction: column;
+    }
+    #save-picture{
+        width: fit-content;
+    }
+</style>
+<div id="settings-container">
+    <label id="profile-pic-label" for="profile-pic-section">Profile Picture</label>
+    <div id="profile-pic-section">
+        <input type="file" id="picture-input" accept="image/*">
+        <button id="save-picture" disabled>Save Picture</button>
+    </div>
+    <label id="ai-label" for="ai-settings">AI Settings</label>
+    <div id="ai-settings">
+        <input id="allow-lists" type="checkbox">
+        <label for="allow-lists">Allow Lists</label>
+    </div>
+</div>

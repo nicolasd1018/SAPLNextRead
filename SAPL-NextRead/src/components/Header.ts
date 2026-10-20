@@ -51,6 +51,12 @@ class Header extends HTMLElement {
                         if ((event.target as HTMLSelectElement).value === 'Logout') {
                             changePage(undefined, undefined, undefined,  true);
                         }
+                        else if ((event.target as HTMLSelectElement).value === 'Settings') {
+                            changePage(undefined, undefined, undefined,  false, true);
+                        }
+                        else if ((event.target as HTMLSelectElement).value === 'ai-profile') {
+                            this.dispatchEvent(new CustomEvent('show-profile-summary'));
+                        }
                     })
                 }
             }

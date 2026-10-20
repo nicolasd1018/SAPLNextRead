@@ -11,6 +11,7 @@ import FilterModal from '../components/FilterModal';
 import User from '../Types/User';
 import Searchbar from '../components/Searchbar.js';
 import Author from '../Types/Author';
+import { GoogleGenAI } from '@google/genai';
 
 
 
@@ -114,6 +115,31 @@ export class MainPage extends HTMLElement {
         let searchedBook: book;
         let authoredBooks: book[];
         let authorSearchList: book[] = [];
+
+        this.addEventListener('display-profile-summary', async () => {
+            console.log(errorModal!.getAttribute('error-message'));
+            if (errorModal && (errorModal.getAttribute('error-title') === '' || errorModal.getAttribute('error-title') === null)) {
+                errorModal!.setAttribute('error-title', 'AI Profile Summary');
+                const ai = new GoogleGenAI({ apiKey:  process.env.VITE_GEMINI_API_KEY});
+                try {
+                    console.log(this.user?.searchLists);
+                    const response = await ai.models.generateContent({
+                    model: 'gemini-3-flash-preview', // or your preferred model version
+                    contents: `Use 500 words or less. Generate a user profile for me based on these lists of books and their names: ${this.user!.searchLists.map((list)=> `${list.name} ${list.books.toLocaleString()}`)}`,
+                    });
+
+                    errorModal!.setAttribute('error-message', response.text!);
+                    console.log(response.text!);
+                } catch (error) {
+                    console.error('Error calling Gemini API:', error);
+                }
+
+
+                
+                (errorModal as ErrorModal).addInformation();
+                errorModal!.style.display = 'flex';
+            }
+        })
 
         if (searchBar && search && searchBar instanceof HTMLInputElement) {
             search?.addEventListener('change-search-criteria', async ()=>{
@@ -312,7 +338,7 @@ export class MainPage extends HTMLElement {
                                     row.appendChild(bookTitle);
                                     row.appendChild(checkbox);
                                     authorBookSearch.appendChild(row);
-                                    BookCarousel!.style.top = '68%';
+                                    BookCarousel!.style.top = '75%';
                                 })
                             }
                         }
