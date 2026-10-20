@@ -32,7 +32,7 @@ export default class AccountSelectionPage extends HTMLElement {
                     
                     const userButton = document.createElement('input') as HTMLInputElement;
                     userButton.type = 'image';
-                    userButton.src = '/placeholder_profile_pick.png';
+                    userButton.src = user.profilePicture ?? '/placeholder_profile_pick.png';
                     userButton.className = 'user-button';
                     userButton.id = `${user.id}-${user.userName}-button`;
 

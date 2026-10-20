@@ -42,6 +42,11 @@ class Header extends HTMLElement {
                         (name as HTMLOptionElement).innerText = this.user.userName;
                     }
                     profile.style.display='flex';
+
+                    const profilePicture = profile.querySelector('#profile-pic');
+                    if(profilePicture && this.user.profilePicture) {
+                        (profilePicture as HTMLImageElement).src = this.user.profilePicture;
+                    }
                 }
 
                 const menu = profile.querySelector('select');

@@ -1,5 +1,6 @@
 import User from "../Types/User";
 import templateString from '../Pages/SettingsPage.template.html?raw';
+import { changePage, setUser } from "../renderer";
 
 export class SettingsPage extends HTMLElement {
     _user: User | undefined = undefined;
@@ -40,6 +41,13 @@ export class SettingsPage extends HTMLElement {
                     const imgFile = imageInput.files![0];
                     const buffer = await imgFile.arrayBuffer();
                     const binaryData = new Uint8Array(buffer);
+                    window.api.updateProfilePicture(this.user!.id,binaryData).then(() => {
+                        const blob = new Blob([binaryData]);
+                        const imageUrl = URL.createObjectURL(blob);
+                        const updatedUser: User = {...this.user!, profilePicture: imageUrl}
+                        setUser(updatedUser);
+                    });
+                    imageInput.value = '';
                 })
             }
         }

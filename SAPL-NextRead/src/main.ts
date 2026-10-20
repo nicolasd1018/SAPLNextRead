@@ -6,6 +6,7 @@ import { DatabaseSync, StatementResultingChanges } from 'node:sqlite';
 import User from './Types/User';
 import bcrypt from "bcryptjs";
 import BookList from './Types/bookList';
+import { number } from 'mathjs';
 
 
 
@@ -89,7 +90,12 @@ ipcMain.handle('get-users', async (event) => {
           const useState = getUseState.get(preUser.useState_id);
           const getBookLists = db.prepare(`SELECT * FROM bookLists WHERE user_id= ?`);
           const bookLists = getBookLists.all(preUser.id);
-          const newUser: User = {id: preUser.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[]]};
+          const uint8Array = preUser.profilePicture as Uint8Array;
+          const binaryString = Array.from(uint8Array, byte => String.fromCharCode(byte)).join('');
+          const base64String = btoa(binaryString);
+          const imageSrcString = `data:image/png;base64,${base64String}`;
+
+          const newUser: User = {profilePicture: imageSrcString, id: preUser.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[],]};
          return newUser;
         })
     } catch (error) {
@@ -106,15 +112,29 @@ ipcMain.handle('get-password', async (event, id: number) =>{
 })
 
 ipcMain.handle('get-user', (event, id: number) => {
-  const getUser = db.prepare('SELECT id, useState_id, username FROM users WHERE id = ?');
-  const  preUser = getUser.get(id);
+  try {
+    const getUser = db.prepare('SELECT id, useState_id, username, profilePicture FROM users WHERE id = ?');
+    const  preUser = getUser.get(id);
 
-  const getUseState = db.prepare(`SELECT * FROM useStates WHERE id = ?`);
-  const useState = getUseState.get(preUser!.useState_id);
-  const getBookLists = db.prepare(`SELECT * FROM bookLists WHERE user_id= ?`);
-  const bookLists = getBookLists.all(preUser!.id);
-  const newUser: User = {id: preUser!.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser!.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[]]};
-  return newUser;
+    const getUseState = db.prepare(`SELECT * FROM useStates WHERE id = ?`);
+    const useState = getUseState.get(preUser!.useState_id);
+    const getBookLists = db.prepare(`SELECT * FROM bookLists WHERE user_id= ?`);
+    const bookLists = getBookLists.all(preUser!.id);
+    const uint8Array = preUser!.profilePicture as Uint8Array;
+    const binaryString = Array.from(uint8Array, byte => String.fromCharCode(byte)).join('');
+    const base64String = btoa(binaryString);
+    const imageSrcString = `data:image/png;base64,${base64String}`;
+    const newUser: User = {profilePicture: imageSrcString, id: preUser!.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser!.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[]]};
+    return newUser;
+  } catch (error) {
+        console.error("Database query get-users failed:", error);
+        throw error;
+    }
+});
+
+ipcMain.handle('update-profile-pic', (event, id: number, profilePicture: Uint8Array<ArrayBuffer>) => {
+  const updateUser = db.prepare('UPDATE users SET profilePicture = ? WHERE id = ?');
+  updateUser.run(profilePicture!, id);
 });
 
 ipcMain.handle('update-list', (event, id: number, list: string[]) => {

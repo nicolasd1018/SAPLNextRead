@@ -52,6 +52,7 @@ export default class PasswordModal extends HTMLElement{
                 submitButton.addEventListener('click', async ()=>{
                     if (bcrypt.compareSync(passwordInput.value, this.password)) {
                         const user = await window.api.getUser(this.userId);
+                        console.log(user);
                         changePage(user);
                     }
                     
