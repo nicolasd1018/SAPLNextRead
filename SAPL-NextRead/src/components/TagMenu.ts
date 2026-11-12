@@ -1,5 +1,4 @@
-import { first, from } from 'rxjs';
-import { getAllContentWarnings, getAllGenres, getAllMoods, getAllPublishers } from '../API/HardcoverAPI';
+import { getAllContentWarnings, getAllGenres, getAllMoods } from '../API/HardcoverAPI';
 import templateString from '../components/TagMenu.template.html?raw'
 import Tag from '../Types/Tag';
 
@@ -181,10 +180,6 @@ class TagMenu extends HTMLElement {
                 tags = await getAllContentWarnings(index);
         if (tagType && tagType === 'mood')
                 tags = await getAllMoods(index);
-        if (tagType && tagType === 'publisher') {
-            const publishers = await getAllPublishers(index);
-            tags = publishers.map((pub) => pub.name);
-        }
         return tags;
     }
 

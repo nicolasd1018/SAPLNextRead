@@ -28,7 +28,19 @@ export class SettingsPage extends HTMLElement {
             this.shadowRoot.innerHTML = templateString;
             const saveImageButton : HTMLButtonElement | undefined = this.shadowRoot.getElementById('save-picture') as HTMLButtonElement | undefined;
             const imageInput : HTMLInputElement | undefined = this.shadowRoot.getElementById('picture-input') as HTMLInputElement | undefined;
-
+            const allowListsCheckbox : HTMLInputElement | undefined = this.shadowRoot.getElementById('allow-lists') as HTMLInputElement | undefined;
+            const ratingThresholdInput : HTMLInputElement | undefined = this.shadowRoot.getElementById('rating-threshold-input') as HTMLInputElement | undefined;
+            if (allowListsCheckbox && this.user) {
+                allowListsCheckbox.checked = this.user.allowedToUseData;
+                console.log(allowListsCheckbox.checked);
+                allowListsCheckbox.addEventListener('change', async () => {
+                    if (this.user) {
+                        const updatedUser: User = {...this.user!, allowedToUseData: allowListsCheckbox.checked};
+                        await window.api.updateAllowedToUseData(this.user!.id, allowListsCheckbox.checked);
+                        setUser(updatedUser);
+                    }
+                });
+            }
             if (saveImageButton && imageInput) {
                 imageInput.addEventListener('change', (event) => {
                     if ((event.target as HTMLInputElement).files?.length !== 0)
@@ -49,6 +61,17 @@ export class SettingsPage extends HTMLElement {
                     });
                     imageInput.value = '';
                 })
+            }
+            if (ratingThresholdInput && this.user) {
+                ratingThresholdInput.value = this.user.bookRatingThreshold.toString();
+                ratingThresholdInput.addEventListener('change', async () => {
+                    const newThreshold = parseInt(ratingThresholdInput.value); 
+                    if (!isNaN(newThreshold) && newThreshold >= 0 && newThreshold <= 5) {
+                        const updatedUser: User = {...this.user!, bookRatingThreshold: newThreshold};
+                        await window.api.updateBookRatingThreshold(this.user!.id, newThreshold);
+                        setUser(updatedUser);
+                    }
+                });
             }
         }
     }

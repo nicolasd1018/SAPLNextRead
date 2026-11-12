@@ -1,0 +1,104 @@
+<style>
+    #conversation-container {
+        display: flex;
+        border: 2px solid #000000;
+        width: 80vw;
+        height: 70vh;
+        margin-left: 20px;
+        overflow-y: auto;
+        flex-direction: column;
+        gap: 10px;
+        position: relative; /* Added to position the loader correctly */
+    }
+    #ai-buttons-container {
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+    }
+    .user-message {
+        background-color: #602983;
+        color: #ffffff;
+        padding: 10px;
+        border-radius: 5px;
+        align-self: flex-end;
+    }
+    .ai-message {
+        padding: 10px;
+        border-radius: 5px;
+    }
+    #user-input {
+        margin-left: 20px;
+        margin-top: 10px;
+        width: 80vw !important;
+    }
+    .loader{
+        transform: translate(-50%, -50%);
+        display: none;
+        align-items: center;
+        position: absolute;
+        bottom: 20px;              /* Forces it to the bottom */
+        left: 50%;                 /* Centers it horizontally */
+        transform: translateX(-50%);    
+    }
+    /* Creating the dots */
+    span{
+    height: 5px;
+    width: 5px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background-color: #602983;
+    animation: loading 1s linear infinite;
+    }
+    /* Creating the loading animation*/
+    @keyframes loading {
+    0%{
+        transform: translateX(0);
+    }
+    25%{
+        transform: translateX(3px);
+    }
+    50%{
+        transform: translateX(-3px);
+    }
+    100%{
+        transform: translateX(0);
+    }
+    
+    }
+
+    span:nth-child(1){
+        animation-delay: 0.1s;
+    }
+    span:nth-child(2){
+        animation-delay: 0.2s;
+    }
+    span:nth-child(3){
+        animation-delay: 0.3s;
+    }
+    span:nth-child(4){
+        animation-delay: 0.4s;
+    }
+    span:nth-child(5){
+        animation-delay: 0.5s;
+    }
+</style>
+<div style="display: flex; flex-direction: row; margin-top: 20px; gap: 15px;">
+    <div style="display: flex; flex-direction: column;">
+        <div id="conversation-container">
+            <div class="loader">
+                <span></span>
+                <span ></span>
+                <span ></span>
+                <span ></span>
+                <span></span>
+                <span></span>
+            </div>    
+        </div>
+        <input type="text" id="user-input" placeholder="Type your message here..." />
+    </div>
+    <div id="ai-buttons-container">
+        <button id="ai-profile-button">AI Profile</button>
+        <button id="expand-horizon-button">Expand Horizons</button>
+        <button id="plan-reading-goal-button">Plan Reading Goal</button>
+    </div>
+</div>

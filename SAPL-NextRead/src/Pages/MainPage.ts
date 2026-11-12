@@ -1,5 +1,5 @@
 import templateString from '../Pages/MainPage.template.html?raw';
-import { book, getAuthor, getAuthorBooks, getBook, getListBooks, getRecommendations } from '../API/HardcoverAPI';
+import { book, getAuthor, getAuthorBooks, getBook, getListBooks, getPublisherBooks, getRecommendations } from '../API/HardcoverAPI';
 import '../components/Searchbar.js'; 
 import { changePage } from '../renderer';
 import '../components/LoadingScreen';
@@ -116,35 +116,10 @@ export class MainPage extends HTMLElement {
         let authoredBooks: book[];
         let authorSearchList: book[] = [];
 
-        this.addEventListener('display-profile-summary', async () => {
-            console.log(errorModal!.getAttribute('error-message'));
-            if (errorModal && (errorModal.getAttribute('error-title') === '' || errorModal.getAttribute('error-title') === null)) {
-                errorModal!.setAttribute('error-title', 'AI Profile Summary');
-                const ai = new GoogleGenAI({ apiKey:  process.env.VITE_GEMINI_API_KEY});
-                try {
-                    console.log(this.user?.searchLists);
-                    const response = await ai.models.generateContent({
-                    model: 'gemini-3-flash-preview', // or your preferred model version
-                    contents: `Use 500 words or less. Generate a user profile for me based on these lists of books and their names: ${this.user!.searchLists.map((list)=> `${list.name} ${list.books.toLocaleString()}`)}`,
-                    });
-
-                    errorModal!.setAttribute('error-message', response.text!);
-                    console.log(response.text!);
-                } catch (error) {
-                    console.error('Error calling Gemini API:', error);
-                }
-
-
-                
-                (errorModal as ErrorModal).addInformation();
-                errorModal!.style.display = 'flex';
-            }
-        })
-
         if (searchBar && search && searchBar instanceof HTMLInputElement) {
             search?.addEventListener('change-search-criteria', async ()=>{
                 loadingScreen!.style.display = 'flex';
-                this.#books = await getListBooks(this.user!.searchLists.find((list) => list.name = 'Liked Books')!.books, this.user!.searchLists.find((list) => list.name = 'Disliked Books')!.books,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter);
+                this.#books = await getListBooks(this.user!.searchLists.find((list) => list.name = 'Liked Books')!.books, this.user!.searchLists.find((list) => list.name = 'Disliked Books')!.books,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, this.user!.bookRatingThreshold);
                 if (this.#books.length > 0) {
                         this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
                     
@@ -168,18 +143,6 @@ export class MainPage extends HTMLElement {
                                 })
                             }
                         }
-
-                        // if (bookTitle && searchedBook && searchedCover && bookslike) {
-                        //     bookslike.style.display = 'flex';
-                        //     bookTitle.textContent = searchedBook.title;
-                        //     bookTitle.addEventListener(('click'), () => {
-                        //         changePage(undefined, searchedBook);
-                        //     });
-                        //     searchedCover.src = searchedBook.image.url;
-                        //     searchedCover.addEventListener('click', () => {
-                        //         changePage(undefined, searchedBook);
-                        //     });
-                        // }
                     }
                     else if (errorModal && errorModal instanceof HTMLElement){
                         errorModal.setAttribute('error-title', 'Search Input Error');
@@ -196,13 +159,16 @@ export class MainPage extends HTMLElement {
                     // get book recommendations from Hardcover
                     loadingScreen!.style.display = 'flex';
                     if ((search as Searchbar).mode === 'author') {
-                        authoredBooks = await getAuthorBooks(searchBar.value);
+                        authoredBooks = await getAuthorBooks(searchBar.value, this.user!.bookRatingThreshold);
                         authorSearchList = authoredBooks.slice(0,5);
-                        this.#books = await getListBooks(authorSearchList.map((book) => book.title),[],this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
+                        this.#books = await getListBooks(authorSearchList.map((book) => book.title),[],this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, this.user!.bookRatingThreshold, iteration);
+                    }
+                    else if ((search as Searchbar).mode === 'publisher'){
+                        this.#books = await getPublisherBooks((searchBar as HTMLInputElement).value, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, this.user!.bookRatingThreshold, iteration);
                     }
                     else {
                         searchedBook = await getBook(searchBar.value) as unknown as book;
-                        this.#books = await getRecommendations(searchedBook.title, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, this.user!.useState.whiteList.filter((tag)=> tag.type === 'publisher').map((tag) => tag.name),  this.user!.useState.blackList.filter((tag)=> tag.type === 'publisher').map((tag) => tag.name));
+                        this.#books = await getRecommendations(searchedBook.title, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, this.user!.useState.whiteList.filter((tag)=> tag.type === 'publisher').map((tag) => tag.name),  this.user!.useState.blackList.filter((tag)=> tag.type === 'publisher').map((tag) => tag.name), this.user!.bookRatingThreshold);
                     }
                     
                     // filter out all the duplicates
@@ -367,6 +333,9 @@ export class MainPage extends HTMLElement {
                     }
                     else if ((search as Searchbar).mode === 'like-dislike'){
                         newBooks = await getListBooks(this.user!.searchLists.find((list) => list.name = 'Liked Books')!.books, this.user!.searchLists.find((list) => list.name = 'Disliked Books')!.books,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
+                    }
+                    else if ((search as Searchbar).mode === 'publisher'){
+                        newBooks = await getPublisherBooks((searchBar as HTMLInputElement).value, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
                     }
                     else {
                         newBooks = await getRecommendations(searchedBook.title,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, this.user!.useState.whiteList.filter((tag)=> tag.type === 'publisher').map((tag) => tag.name),  this.user!.useState.blackList.filter((tag)=> tag.type === 'publisher').map((tag) => tag.name), iteration);

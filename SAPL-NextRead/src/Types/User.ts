@@ -7,4 +7,6 @@ export default interface User {
     userName: string;
     searchLists: BookList[];
     profilePicture?: string;
+    allowedToUseData: boolean;
+    bookRatingThreshold: number;
 }

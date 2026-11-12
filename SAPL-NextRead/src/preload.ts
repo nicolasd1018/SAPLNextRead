@@ -15,4 +15,6 @@ contextBridge.exposeInMainWorld('api', {
     getUser: (id: number) => ipcRenderer.invoke('get-user', id),
     updateList: (id: number, list: string[]) => ipcRenderer.invoke('update-list', id, list),
     updateProfilePicture: (id: number, profilePicture: Uint8Array<ArrayBuffer>) => ipcRenderer.invoke('update-profile-pic', id, profilePicture),
+    updateAllowedToUseData: (id: number, allowedToUseData: boolean) => ipcRenderer.invoke('update-allowed-to-use-data', id, allowedToUseData),
+    updateBookRatingThreshold: (id: number, bookRatingThreshold: number) => ipcRenderer.invoke('update-book-rating-threshold', id, bookRatingThreshold)
 });

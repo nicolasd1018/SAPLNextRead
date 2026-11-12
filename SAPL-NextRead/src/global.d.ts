@@ -15,6 +15,8 @@ declare global {
       getUser: (id: number) => Promise<User>;
       updateList: (id: number, list: string[]) => Promise<void>;
       updateProfilePicture: (id: number, profilePicture: Uint8Array<ArrayBuffer>) => Promise<void>;
-    }
+      updateAllowedToUseData: (id: number, allowedToUseData: boolean) => Promise<void>;
+      updateBookRatingThreshold: (id: number, bookRatingThreshold: number) => Promise<void>;
+    };
   }
 }

@@ -1,9 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache, gql } from "@apollo/client";
 import { SetContextLink } from "@apollo/client/link/context";
-import { re } from "mathjs";
-import Tag from "../Types/Tag";
 import Author from "../Types/Author";
-import { Publisher } from "../Types/Publisher";
 
 const authLink = new SetContextLink(({ headers }) => {
   return {
@@ -37,7 +34,7 @@ export interface book {
     ageRating: string
 }
 
-export const getListBooks = async (bookList: string[], bannedBooks: string[], bipocFilter: boolean, lgbtqFilter:boolean, iteration?: number): Promise<book[]> => {
+export const getListBooks = async (bookList: string[], bannedBooks: string[], bipocFilter: boolean, lgbtqFilter:boolean, bookRatingThreshold: number, iteration?: number): Promise<book[]> => {
     var reccomendation: book[] =  [];
     let list = '';
     let bannedList = ''
@@ -105,10 +102,10 @@ export const getListBooks = async (bookList: string[], bannedBooks: string[], bi
         query MyQuery {
             books (where: {_and: [{_or: [${list}]}, {users_read_count: {_gt: 0}}]})
             {
-                user_books (where: {rating: {_gte: 4}}
+                user_books (where: {rating: {_gte: ${bookRatingThreshold}}},
                             ${iteration ? `offset: ${10* iteration}` : ''} limit: 10){
                 user{
-                    user_books (where:{_and: [{rating: {_gte: 4}}, ${bannedList}${bipocFilter ? ", {book: {contributions: {author: {is_bipoc: {_eq: true}}}}}": ''}${lgbtqFilter ? ", {book: {contributions: {author: {is_lgbtq: {_eq: true}}}}}": ''}]}
+                    user_books (where:{_and: [{rating: {_gte: ${bookRatingThreshold}}}, ${bannedList}${bipocFilter ? ", {book: {contributions: {author: {is_bipoc: {_eq: true}}}}}": ''}${lgbtqFilter ? ", {book: {contributions: {author: {is_lgbtq: {_eq: true}}}}}": ''}]}
                                 order_by: {rating: desc}
       
                                  limit: 5){
@@ -138,7 +135,93 @@ export const getListBooks = async (bookList: string[], bannedBooks: string[], bi
     return  reccomendation;
 }
 
-export const getAuthorBooks = async (author: string) => {
+export const getPublisherBooks = async (publisher: string, bipocFilter: boolean, lgbtqFilter:boolean, bookRatingThreshold: number, iteration?: number) => {
+    let reccomendation: book[] = [];
+    await client
+    .query({
+        query: gql`
+        fragment cover on books
+        {
+        image {
+                            url
+                }
+        }
+
+        fragment information on books{
+        id
+        title
+        subtitle
+        contributions{author
+            {name
+            is_bipoc
+            is_lgbtq
+            }}
+        description
+        book_series {
+            position
+            series {
+            name
+            books_count
+            }
+        }
+        }
+
+        fragment genres on books{
+        genres: taggable_counts(where: {tag: {tag_category_id: {_eq: 1}}}order_by: {count: desc_nulls_last} limit: 5){
+                tag{
+                    tag
+                }
+            }
+        }
+
+        fragment contentWarnings on books {
+        contentWarnings: taggable_counts(where: {tag: {tag_category_id: {_eq: 3}}}order_by: {count: desc_nulls_last}){
+                tag{
+                    tag
+                }
+            }
+        }
+
+        fragment moods on books{
+            moods: taggable_counts(where: {tag: {tag_category_id: {_eq: 4}}}order_by: {count: desc_nulls_last} limit: 5){
+                tag{
+                    tag
+                }
+            }
+        }
+
+        query MyQuery {
+            books(
+                where:{editions: {publisher: {name: {_eq: "${publisher}"}}}
+                        ${bipocFilter ? ", {contributions: {author: {is_bipoc: {_eq: true}}}}" : ''}
+                        ${lgbtqFilter ? ", {contributions: {author: {is_lgbtq: {_eq: true}}}}" : ''}
+                }
+                order_by: {activities_count: desc_nulls_last}
+                ${iteration ? `offset: ${50* iteration}` : ''} limit: 50
+            )
+            {
+                        ...cover
+                        ...information
+                        ...genres
+                        ...contentWarnings
+                        ...moods
+            }
+    }
+    `,
+        errorPolicy: 'all'
+    }).then((result) => { 
+        console.log(result);
+        if ((result.data).books.length ===0 ) {
+            reccomendation = []
+        }
+        else
+         reccomendation = result.data.books;
+    })
+    .catch((error)=>console.log(error));
+    return  reccomendation;
+}
+
+export const getAuthorBooks = async (author: string, bookRatingThreshold: number    ) => {
     let reccomendation: book[] = [];
     const authorProfile = await getAuthor(author);
     console.log(authorProfile?.name ?? '');
@@ -223,7 +306,6 @@ export const getAuthorBooks = async (author: string) => {
     return  reccomendation;
 }
 
-
 export const getBook = async (title: string): Promise<book | undefined> => {
     let book: book | undefined = undefined;
     await client
@@ -292,7 +374,7 @@ export const getAuthor = async (author: string, exactSearch: boolean = false): P
     return authorProfile;
 }
 
-export const getRecommendations = async (title: string, bipocFilter: boolean, lgbtqFilter:boolean, publisherWhiteList: string[], publisherBlackList: string[], iteration?: number): Promise<book[]>=> {
+export const getRecommendations = async (title: string, bipocFilter: boolean, lgbtqFilter:boolean, publisherWhiteList: string[], publisherBlackList: string[], bookRatingThreshold: number, iteration?: number): Promise<book[]>=> {
     var reccomendation: book[] =  [];
     console.log(publisherWhiteList);
     let allowedPublishers = `{_or: [`;
@@ -363,10 +445,10 @@ export const getRecommendations = async (title: string, bipocFilter: boolean, lg
         query MyQuery {
             books (where: {_and: [{title: {_eq: "${title}"}}, {users_read_count: {_gt: 0}} ${publisherWhiteList.length > 0 ? `,${allowedPublishers}`: ''} ${publisherBlackList.length > 0 ? `,${bannedPublishers}`: ''}]})
             {
-                user_books (where: {rating: {_gte: 4}}
+                user_books (where: {rating: {_gte: ${bookRatingThreshold}}}
                             ${iteration ? `offset: ${10* iteration}` : ''} limit: 10){
                 user{
-                    user_books (where:{_and: [{rating: {_gte: 4}}, {book: {title: {_neq: "${title}"}}}${bipocFilter ? ", {book: {contributions: {author: {is_bipoc: {_eq: true}}}}}": ''}${lgbtqFilter ? ", {book: {contributions: {author: {is_lgbtq: {_eq: true}}}}}": ''}]}
+                    user_books (where:{_and: [{rating: {_gte: ${bookRatingThreshold}}}, {book: {title: {_neq: "${title}"}}}${bipocFilter ? ", {book: {contributions: {author: {is_bipoc: {_eq: true}}}}}": ''}${lgbtqFilter ? ", {book: {contributions: {author: {is_lgbtq: {_eq: true}}}}}": ''}]}
                                 order_by: {rating: desc}
       
                                  limit: 5){
@@ -432,25 +514,4 @@ export const getAllMoods = async (iteration: number = 0) =>{
         }
         `, errorPolicy: 'all'}) as {data: {tags: {tag: string}[]}};
     return tags.data.tags.map((tag)=> tag.tag);
-}
-
-export const getAllPublishers = async (iteration: number = 0): Promise<Publisher[]> => {
-    let results: {data: {publishers: {name: string, editions: {book: {id: number}}[]}[]}} = await client
-    .query({
-        query: gql`
-        query MyQuery {
-        publishers (order_by: {editions_count: desc_nulls_last} offset:${50*iteration} limit: 50 ) {
-            name
-            editions  {
-                    book {
-                        id
-                    }
-                }
-            }
-        }
-        `, errorPolicy: 'all'}) as {data: {publishers: {name: string, editions: {book: {id: number}}[]}[]}};
-        console.log(results);
-    return results.data.publishers.map((pub) => {
-        return {name:pub.name, bookIds: pub.editions.map((ed) => ed.book.id)}; 
-    });
 }

@@ -35,14 +35,14 @@ import './Pages/AuthorPage';
 import './Pages/SettingsPage';
 import { book as Book } from './API/HardcoverAPI';
 import { MainPage } from './Pages/MainPage';
-import { USBDevice } from 'electron';
-import UseState from './Types/UseState';
 import BookPage from './Pages/BookPage';
 import User from './Types/User';
 import Header from './components/Header';
 import Author from './Types/Author';
 import AuthorPage from './Pages/AuthorPage';
 import { SettingsPage } from './Pages/SettingsPage';
+import AIPage from './Pages/AIPage';
+import './Pages/AIPage';
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
@@ -54,13 +54,10 @@ const authorPage = document.createElement('author-page');
 const header = document.createElement('nextread-header');
 const accountSelectionPage = document.createElement('account-selection-page');
 const settingsPage = document.createElement('settings-page');
-
-header.addEventListener('show-profile-summary', () => {
-  mainPage.dispatchEvent(new CustomEvent('display-profile-summary'));
-});
+const aiPage = document.createElement('ai-page');
 
 
-export const changePage = (user?: User, book?: Book, author?: Author, logout: boolean = false, settings: boolean = false) => {
+export const changePage = (user?: User, book?: Book, author?: Author, logout: boolean = false, settings: boolean = false, ai: boolean = false) => {
   if (book) {
     console.log('test');
     mainPage.style.display = 'none';
@@ -86,7 +83,21 @@ export const changePage = (user?: User, book?: Book, author?: Author, logout: bo
   }
   else if (logout){
     setUser( undefined);
-    document.body.removeChild(mainPage);
+    if (document.body.contains(mainPage)) {
+      document.body.removeChild(mainPage);
+    }
+    if (document.body.contains(bookPage)) {
+      document.body.removeChild(bookPage);
+    }
+    if (document.body.contains(authorPage)) {
+      document.body.removeChild(authorPage);
+    }
+    if (document.body.contains(settingsPage)) {
+      document.body.removeChild(settingsPage);
+    }
+    if (document.body.contains(aiPage)) {
+      document.body.removeChild(aiPage);
+    }
     document.body.appendChild(accountSelectionPage);
   }
   else if (author) {
@@ -98,12 +109,22 @@ export const changePage = (user?: User, book?: Book, author?: Author, logout: bo
   else if (settings) {
     if (document.body.contains(bookPage)) document.body.removeChild(bookPage);
     if (document.body.contains(authorPage)) document.body.removeChild(authorPage);
+    if (document.body.contains(aiPage)) document.body.removeChild(aiPage);
     mainPage.style.display = 'none';
     document.body.append(settingsPage);
+  }
+  else if (ai) {
+    if (document.body.contains(bookPage)) document.body.removeChild(bookPage);
+    if (document.body.contains(authorPage)) document.body.removeChild(authorPage);
+    if (document.body.contains(settingsPage)) document.body.removeChild(settingsPage);
+    mainPage.style.display = 'none';
+    document.body.append(aiPage);
   }
   else {
     if (document.body.contains(bookPage)) document.body.removeChild(bookPage);
     if (document.body.contains(authorPage)) document.body.removeChild(authorPage);
+    if (document.body.contains(settingsPage)) document.body.removeChild(settingsPage);
+    if (document.body.contains(aiPage)) document.body.removeChild(aiPage);
 
     mainPage.style.display = 'block';
   }
@@ -114,6 +135,7 @@ export const setUser = (user: User | undefined) => {
   (header as Header).user = user;
   (bookPage as BookPage).user = user;
   (settingsPage as SettingsPage).user = user;
+  (aiPage as AIPage).user = user;
 }
 
 

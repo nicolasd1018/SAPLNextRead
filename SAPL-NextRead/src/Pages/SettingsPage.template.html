@@ -2,20 +2,53 @@
     #profile-pic-section{
         display: flex;
         flex-direction: column;
+        gap: 5px;
     }
     #save-picture{
         width: fit-content;
     }
+    #settings-container{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-left: 20px;
+    }
+      #rating-threshold-ticks {
+        display: flex;
+        justify-content: space-between;
+        width: 129px; /* Adjust this width to match the width of your slider */
+        padding: 0 6px; /* Aligns numbers with the center of the slider thumb */
+        box-sizing: border-box;
+    }
+
+    #rating-threshold-ticks option {
+        padding: 0;
+        font-size: 14px;
+    }
 </style>
 <div id="settings-container">
+    <h1>Profile Information</h1>
     <label id="profile-pic-label" for="profile-pic-section">Profile Picture</label>
     <div id="profile-pic-section">
         <input type="file" id="picture-input" accept="image/*">
         <button id="save-picture" disabled>Save Picture</button>
     </div>
+    <h1>Account Settings</h1>
     <label id="ai-label" for="ai-settings">AI Settings</label>
     <div id="ai-settings">
         <input id="allow-lists" type="checkbox">
-        <label for="allow-lists">Allow Lists</label>
+        <label for="allow-lists">Allow User data</label>
+    </div>
+    <label id="rating-threshold-label" for="rating-threshold">Rating Threshold</label>
+    <div id="rating-threshold">
+        <input type="range" id="rating-threshold-input" min="0" max="5" step="0.5" list="rating-threshold-ticks">
+        <datalist id="rating-threshold-ticks">
+            <option value="0" label="0"></option>
+            <option value="1" label="1"></option>
+            <option value="2" label="2"></option>
+            <option value="3" label="3"></option>
+            <option value="4" label="4"></option>
+            <option value="5" label="5"></option>
+        </datalist>
     </div>
 </div>

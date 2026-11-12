@@ -47,6 +47,12 @@ class Searchbar extends HTMLElement {
                         searchInput.disabled = false;
                         searchInput.value = '';
                     }
+                    else if ((event.target as HTMLSelectElement).value === 'publisher') {
+                        this.mode = 'publisher';
+                        searchInput.removeAttribute('pattern');
+                        searchInput.disabled = false;
+                        searchInput.value = '';
+                    }
                     else if ((event.target as HTMLSelectElement).value === 'like-dislike') {
                         this.mode = 'like-dislike';
                         searchInput.removeAttribute('pattern');
