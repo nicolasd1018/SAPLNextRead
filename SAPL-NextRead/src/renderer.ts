@@ -80,6 +80,7 @@ export const changePage = (user?: User, book?: Book, author?: Author, logout: bo
     document.body.removeChild(accountSelectionPage);
     setUser(user);
     document.body.appendChild(mainPage)
+    mainPage.style.display = 'block';
   }
   else if (logout){
     setUser( undefined);

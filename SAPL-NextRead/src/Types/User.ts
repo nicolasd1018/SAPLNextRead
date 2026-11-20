@@ -9,4 +9,9 @@ export default interface User {
     profilePicture?: string;
     allowedToUseData: boolean;
     bookRatingThreshold: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    address: string;
+    gender: string;
 }

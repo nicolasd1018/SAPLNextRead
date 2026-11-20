@@ -25,13 +25,65 @@
         padding: 0;
         font-size: 14px;
     }
+    #name-container{
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+    }
+    #email-input{
+        width: 300px;
+    }
+    #address-input{
+        width: 300px;
+    }
+    #list-management{
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 100px;
+    }
+    add-list-modal{
+        display: none;
+    }
 </style>
+<add-list-modal></add-list-modal>
 <div id="settings-container">
     <h1>Profile Information</h1>
     <label id="profile-pic-label" for="profile-pic-section">Profile Picture</label>
     <div id="profile-pic-section">
         <input type="file" id="picture-input" accept="image/*">
         <button id="save-picture" disabled>Save Picture</button>
+    </div>
+    <div id="name-container">
+        <label id="name-label" for="name-input">First Name</label>
+        <input type="text" id="name-input" placeholder="Enter your first name">
+        <label id="last-name-label" for="last-name-input">Last Name</label>
+        <input type="text" id="last-name-input" placeholder="Enter your last name">
+    </div>
+    <div id="email-container">
+        <label id="email-label" for="email-input">Email</label>
+        <input type="email" id="email-input" placeholder="Enter your email">
+    </div>
+    <div id="address-container">
+        <label id="address-label" for="address-input">Address</label>
+        <input type="text" id="address-input" placeholder="Enter your address">
+    </div>
+    <div id="gender-container">
+        <label id="gender-label" for="gender-input">Gender</label>
+        <select id="gender-input">
+            <option value="">Select your gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="non-binary">Non-Binary</option>
+            <option value="other">Other</option>
+            <option value="prefer-not-to-say">Prefer not to say</option>
+        </select>
+    </div>
+    <div id="login-container">
+        <label id="login-label" for="username-input">Username</label>
+        <input type="text" id="username-input">
+        <label id="password-label" for="password-input">Password</label>
+        <input id="password-input" type="password">
     </div>
     <h1>Account Settings</h1>
     <label id="ai-label" for="ai-settings">AI Settings</label>
@@ -51,4 +103,12 @@
             <option value="5" label="5"></option>
         </datalist>
     </div>
+    <div id="list-management">
+        <h2>List Management</h2>
+        <button id="add-list">Add List</button>
+        <select id="list-select" size="5">
+        </select>
+        <button id="delete-list">Delete List</button>
+    </div>
+    <button id="save-settings">Save Settings</button>
 </div>

@@ -73,7 +73,7 @@ export default class AIPage extends HTMLElement {
                 planReadingGoalButton?.setAttribute('disabled', 'true');
                 userInput?.setAttribute('disabled', 'true');
                 try {
-                    const response = await chat.sendMessage({message: `Use 500 words or less, generate a user profile for me based on these lists of books and their names: ${this.user?.allowedToUseData ? this.user!.searchLists.map((list)=> `${list.name} ${list.books.toLocaleString()}`) : [] }. If there are none, say so. Wrap new lines and paragraphs in divs. use html heading as appropriate.`});
+                    const response = await chat.sendMessage({message: `Use 500 words or less, generate a user profile for me based on these lists of books and their names, gender, and address: ${this.user?.allowedToUseData ? (this.user!.searchLists.map((list)=> `${list.name} ${list.books.toLocaleString()}`)) : [] }${this.user?.allowedToUseData ? ` Gender: ${this.user!.gender}` : ''}${this.user?.allowedToUseData ? ` Address: ${this.user!.address}` : ''}. If there are none, say so. Wrap new lines and paragraphs in divs. use html heading as appropriate.`});
                     if (conversationContainer) {
                         conversationContainer.insertAdjacentHTML('beforeend', `<div class="ai-message" >${response.text!}</div>`);
                     }
@@ -97,7 +97,7 @@ export default class AIPage extends HTMLElement {
                 planReadingGoalButton?.setAttribute('disabled', 'true');
                 userInput?.setAttribute('disabled', 'true');
                 try {
-                    const response =  await chat.sendMessage({message: `Use 500 words or less, expand my literary horizons and suggest things I might like outside of my normal reading habits based on these lists of books and their names: ${this.user?.allowedToUseData ? this.user!.searchLists.map((list)=> `${list.name} ${list.books.toLocaleString()}`) : []}. If there are none, say so. Wrap new lines and paragraphs in divs. use html heading as appropriate.`});
+                    const response =  await chat.sendMessage({message: `Use 500 words or less, expand my literary horizons and suggest things I might like outside of my normal reading habits based on these lists of books and their names, gender, and address: ${this.user?.allowedToUseData ? (this.user!.searchLists.map((list)=> `${list.name} ${list.books.toLocaleString()}`)) : [] }${this.user?.allowedToUseData ? ` Gender: ${this.user!.gender}` : ''}${this.user?.allowedToUseData ? ` Address: ${this.user!.address}` : ''}. If there are none, say so. Wrap new lines and paragraphs in divs. use html heading as appropriate.`});
 
                     if (conversationContainer) {
                         conversationContainer.insertAdjacentHTML('beforeend', `<div class="ai-message">${response.text!}</div>`);
@@ -122,7 +122,7 @@ export default class AIPage extends HTMLElement {
                 planReadingGoalButton.setAttribute('disabled', 'true');
                 userInput?.setAttribute('disabled', 'true');
                 try {
-                    const response = await chat.sendMessage({message: `Use 500 words or less, plan a reading goal for me based on these lists of books and their names: ${this.user?.allowedToUseData ? this.user!.searchLists.map((list)=> `${list.name} ${list.books.toLocaleString()}`) : []}. If there are none, say so. Wrap new lines and paragraphs in divs. use html heading as appropriate.`});
+                    const response = await chat.sendMessage({message: `Use 500 words or less, plan a reading goal for me based on these lists of books and their names, gender, and address: ${this.user?.allowedToUseData ? (this.user!.searchLists.map((list)=> `${list.name} ${list.books.toLocaleString()}`)) : [] }${this.user?.allowedToUseData ? ` Gender: ${this.user!.gender}` : ''}${this.user?.allowedToUseData ? ` Address: ${this.user!.address}` : ''}. If there are none, say so. Wrap new lines and paragraphs in divs. use html heading as appropriate.`});
 
 
                     if (conversationContainer) {

@@ -43,6 +43,11 @@ db.exec(`
     profilePicture BLOB,
     allowedToUseData BOOLEAN NOT NULL DEFAULT 0,
     bookRatingThreshold INTEGER NOT NULL DEFAULT 4,
+    address TEXT,
+    firstName TEXT,
+    lastName TEXT,
+    email TEXT,
+    gender TEXT,
     FOREIGN KEY (useState_id) REFERENCES useStates(id) 
   );  
 
@@ -55,17 +60,17 @@ db.exec(`
   );
 `);
 
-ipcMain.handle('make-user', async (event, username: string, password?: string) => {
+ipcMain.handle('make-user', async (event, username: string, password: string, address: string, firstName: string, lastName: string, email: string, gender: string) => {
     try {
         const createUseState = db.prepare(`INSERT INTO useStates DEFAULT VALUES`);
         const useState = createUseState.run();
         const useStateId = useState.lastInsertRowid;
         let user: StatementResultingChanges;
         if (password) {
-          const createUser = db.prepare(`INSERT INTO users (useState_id, username, password) VALUES (?, ?, ?)`);
+          const createUser = db.prepare(`INSERT INTO users (useState_id, username, password, address, firstName, lastName, email, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
           const manualSalt = bcrypt.genSaltSync(10);
           const manualHash = bcrypt.hashSync(password, manualSalt);
-          user = createUser.run(useStateId, username, manualHash );
+          user = createUser.run(useStateId, username, manualHash, address, firstName, lastName, email, gender);
         }
         else {
           const createUser = db.prepare(`INSERT INTO users (useState_id, username) VALUES (?, ?)`);
@@ -100,7 +105,7 @@ ipcMain.handle('get-users', async (event) => {
             imageSrcString = `data:image/png;base64,${base64String}`;
           }
 
-          const newUser: User = {profilePicture: imageSrcString, id: preUser.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[],], allowedToUseData: !!preUser.allowedToUseData, bookRatingThreshold: preUser.bookRatingThreshold as number};
+          const newUser: User = {profilePicture: imageSrcString, id: preUser.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[],], allowedToUseData: !!preUser.allowedToUseData, bookRatingThreshold: preUser.bookRatingThreshold as number, firstName: preUser.firstName as string, lastName: preUser.lastName as string, email: preUser.email as string, address: preUser.address as string, gender: preUser.gender as string};
          return newUser;
         })
     } catch (error) {
@@ -118,7 +123,7 @@ ipcMain.handle('get-password', async (event, id: number) =>{
 
 ipcMain.handle('get-user', (event, id: number) => {
   try {
-    const getUser = db.prepare('SELECT id, useState_id, username, profilePicture, allowedToUseData, bookRatingThreshold FROM users WHERE id = ?');
+    const getUser = db.prepare('SELECT id, useState_id, username, profilePicture, allowedToUseData, bookRatingThreshold, firstName, lastName, email, address, gender FROM users WHERE id = ?');
     const  preUser = getUser.get(id);
 
     const getUseState = db.prepare(`SELECT * FROM useStates WHERE id = ?`);
@@ -132,7 +137,7 @@ ipcMain.handle('get-user', (event, id: number) => {
       const base64String = btoa(binaryString);
       imageSrcString = `data:image/png;base64,${base64String}`;
     }
-    const newUser: User = {profilePicture: imageSrcString, id: preUser!.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser!.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[]], allowedToUseData: !!preUser!.allowedToUseData, bookRatingThreshold: preUser!.bookRatingThreshold as number};
+    const newUser: User = {profilePicture: imageSrcString, id: preUser!.id as number, useState: {whiteList: JSON.parse(useState!.whiteList as string), blackList: JSON.parse(useState!.blackList as string), ageRange: JSON.parse(useState!.ageRange as string), bipocFilter: !!useState!.bipocFilter, lgbtqFilter: !!useState!.lgbtqFilter}, userName: preUser!.username as string, searchLists: [...bookLists.map((list)=> {return {...list, books: JSON.parse(list.books as string)}}) as unknown as BookList[]], allowedToUseData: !!preUser!.allowedToUseData, bookRatingThreshold: preUser!.bookRatingThreshold as number, firstName: preUser!.firstName as string, lastName: preUser!.lastName as string, email: preUser!.email as string, address: preUser!.address as string, gender: preUser!.gender as string};
     return newUser;
   } catch (error) {
         console.error("Database query get-users failed:", error);
@@ -159,8 +164,47 @@ ipcMain.handle('update-book-rating-threshold', (event, id: number, bookRatingThr
   const updateBookRatingThreshold = db.prepare(`UPDATE users SET bookRatingThreshold = ? WHERE id = ?`);
   updateBookRatingThreshold.run(bookRatingThreshold, id);
 });
+ipcMain.handle('update-first-name', (event, id: number, firstName: string) => {
+  const updateFirstName = db.prepare(`UPDATE users SET firstName = ? WHERE id = ?`);
+  updateFirstName.run(firstName, id);
+});
+ipcMain.handle('update-last-name', (event, id: number, lastName: string) => {
+  const updateLastName = db.prepare(`UPDATE users SET lastName = ? WHERE id = ?`);
+  updateLastName.run(lastName, id);
+});
+ipcMain.handle('update-email', (event, id: number, email: string) => {
+  const updateEmail = db.prepare(`UPDATE users SET email = ? WHERE id = ?`);
+  updateEmail.run(email, id);
+});
+ipcMain.handle('update-address', (event, id: number, address: string) => {
+  const updateAddress = db.prepare(`UPDATE users SET address = ? WHERE id = ?`);
+  updateAddress.run(address, id);
+});
+ipcMain.handle('update-gender', (event, id: number, gender: string) => {
+  const updateGender = db.prepare(`UPDATE users SET gender = ? WHERE id = ?`);
+  updateGender.run(gender, id);
+});
+ipcMain.handle('update-username', (event, id: number, username: string) => {  
+  const updateUsername = db.prepare(`UPDATE users SET userName = ? WHERE id = ?`);
+  updateUsername.run(username, id);
+});
+ipcMain.handle('update-password', (event, id: number, password: string) => {  
+  const updatePassword = db.prepare(`UPDATE users SET password = ? WHERE id = ?`);
+  const manualSalt = bcrypt.genSaltSync(10);
+  const manualHash = bcrypt.hashSync(password, manualSalt);
+  updatePassword.run(manualHash, id);
+});
 
+ipcMain.handle('add-list', (event, userId: number, listName: string) => {
+  const addList = db.prepare(`INSERT INTO bookLists (user_id, name) VALUES (?, ?)`);
+  const result = addList.run(userId, listName);
+  return result.lastInsertRowid;
+});
 
+ipcMain.handle('delete-list', (event,  listId: number) => {
+  const deleteList = db.prepare(`DELETE FROM bookLists WHERE id = ?`);
+  deleteList.run(listId);
+});
 
 const createWindow = () => {
   // Create the browser window.

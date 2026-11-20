@@ -15,10 +15,20 @@ export default class AddUserModal extends HTMLElement{
             const usernameInput = this.shadowRoot.getElementById('username') as HTMLInputElement;
             const passwordInput = this.shadowRoot.getElementById('password') as HTMLInputElement;
             const confirmPasswordInput = this.shadowRoot.getElementById('confirm-password') as HTMLInputElement;
+            const addressInput = this.shadowRoot.getElementById('address') as HTMLInputElement;
+            const firstNameInput = this.shadowRoot.getElementById('first-name') as HTMLInputElement;
+            const lastNameInput = this.shadowRoot.getElementById('last-name') as HTMLInputElement;
+            const emailInput = this.shadowRoot.getElementById('email') as HTMLInputElement;
+            const genderInput = this.shadowRoot.getElementById('gender') as HTMLInputElement;
             
             if (closeButton) {
                 closeButton.addEventListener('click', () => {
                     usernameInput.value = '';
+                    addressInput.value = '';
+                    firstNameInput.value = '';
+                    lastNameInput.value = '';
+                    emailInput.value = '';
+                    genderInput.value = ''; 
                     this.style.display = 'none';
                 });
             }
@@ -34,7 +44,7 @@ export default class AddUserModal extends HTMLElement{
 
             if (createUserButton && usernameInput) {
                 createUserButton.addEventListener('click', async ()=>{
-                    const id = await window.api.addUser(usernameInput.value, (passwordInput.value ?? undefined));
+                    const id = await window.api.addUser(usernameInput.value, (passwordInput.value ?? undefined), addressInput.value, firstNameInput.value, lastNameInput.value, emailInput.value, genderInput.value);
                     usernameInput.value = '';
                     this.style.display = 'none';
                     this.dispatchEvent(new CustomEvent('create-new-user', {detail: {id: id}}));

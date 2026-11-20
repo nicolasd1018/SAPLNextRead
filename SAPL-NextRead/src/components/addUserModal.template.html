@@ -16,7 +16,7 @@
         background-color: white;
         display: flex;
         padding: 10px;
-        width: 400px;
+        width: 600px;
         flex-direction: column;
         gap: 10px;
         align-items: center;
@@ -31,18 +31,53 @@
     .horizontal-container {
         flex-direction: row;
         display: flex;
-        width: 350px;
+        width: 550px;
         justify-content: space-between;
         align-content: space-between;
     }
-    #password:invalid{
+    #password:invalid {
         border: 2px dashed #ff4d4d;
+    }
+    #password {
+        width: 400px;
+    }
+    #confirm-password {
+        width: 400px;
+    }
+    #username {
+        width: 400px;
+    }
+    #address {
+        width: 400px;
     }
 </style>
 
 <div id="modal-background">
     <div id="error-container">
         <div id="title">Add User</div>
+        <div class="horizontal-container">
+            <label title="First Name" for="first-name">First Name</label>
+            <input title="First Name" type="text" id="first-name"></input>
+            <label title="Last Name" for="last-name">Last Name</label>
+            <input title="Last Name" type="text" id="last-name"></input>
+        </div>
+        <div class="horizontal-container">
+            <label title="Email" for="email">Email</label>
+            <input title="Email" type="email" id="email"></input>
+            <label title="Gender" for="gender">Gender</label>
+            <select title="Gender" id="gender">
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="non-binary">Non-binary</option>
+                <option value="other">Other</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+        </div>
+        <div class="horizontal-container">
+            <label title="address" for="address">Address</label>
+            <input title="address" type="text" id="address"></input>
+        </div>
         <div class="horizontal-container">
             <label for="username">Username*</label>
             <input id="username"  minlength="4" required></input>
