@@ -26,7 +26,6 @@ export default class AIPage extends HTMLElement {
             const planReadingGoalButton = this.shadowRoot.getElementById('plan-reading-goal-button');
             const conversationContainer = this.shadowRoot.getElementById('conversation-container');
             const userInput = this.shadowRoot.getElementById('user-input') as HTMLInputElement;
-            const loader = this.shadowRoot.querySelector('.loader') as HTMLElement;
 
             const ai = new GoogleGenAI({ apiKey:  ''});
             const chat = ai.chats.create({model: 'gemini-3-flash-preview'});
@@ -39,7 +38,14 @@ export default class AIPage extends HTMLElement {
                         if (message) {
                             conversationContainer.insertAdjacentHTML('beforeend', `<div class="user-message">${message}</div>`);
                             userInput.value = '';
-                            loader.style.display = 'flex'; // Show the loader
+                            conversationContainer.innerHTML += `<div class="loader">
+                                                                    <span></span>
+                                                                    <span ></span>
+                                                                    <span ></span>
+                                                                    <span ></span>
+                                                                    <span></span>
+                                                                    <span></span>
+                                                                </div>`
                             aiProfileButton?.setAttribute('disabled', 'true');
                             expandHorizonButton?.setAttribute('disabled', 'true');
                             planReadingGoalButton?.setAttribute('disabled', 'true');
@@ -54,7 +60,7 @@ export default class AIPage extends HTMLElement {
                             } catch (error) {
                                 console.error('Error calling Gemini API:', error);
                             } finally {
-                                loader.style.display = 'none';
+                                conversationContainer.removeChild(conversationContainer.querySelector(".loader")!);
                                 aiProfileButton?.removeAttribute('disabled');
                                 expandHorizonButton?.removeAttribute('disabled');
                                 planReadingGoalButton?.removeAttribute('disabled');
@@ -67,7 +73,14 @@ export default class AIPage extends HTMLElement {
 
             if (aiProfileButton && this.user) {
                 aiProfileButton.addEventListener('click', async () => {
-                loader.style.display = 'flex'; // Show the loader
+                conversationContainer!.innerHTML += `<div class="loader">
+                                                                    <span></span>
+                                                                    <span ></span>
+                                                                    <span ></span>
+                                                                    <span ></span>
+                                                                    <span></span>
+                                                                    <span></span>
+                                                                </div>`
                 aiProfileButton.setAttribute('disabled', 'true');
                 expandHorizonButton?.setAttribute('disabled', 'true');
                 planReadingGoalButton?.setAttribute('disabled', 'true');
@@ -80,7 +93,7 @@ export default class AIPage extends HTMLElement {
                 } catch (error) {
                     console.error('Error calling Gemini API:', error);
                 } finally {
-                    loader.style.display = 'none';
+                    conversationContainer!.removeChild(conversationContainer!.querySelector(".loader")!);
                     aiProfileButton.removeAttribute('disabled');
                     expandHorizonButton?.removeAttribute('disabled');
                     planReadingGoalButton?.removeAttribute('disabled');
@@ -91,7 +104,14 @@ export default class AIPage extends HTMLElement {
 
             if (expandHorizonButton && this.user) {
             expandHorizonButton?.addEventListener('click', async () => {
-                loader.style.display = 'flex'; // Show the loader
+                conversationContainer!.innerHTML += `<div class="loader">
+                                                                    <span></span>
+                                                                    <span ></span>
+                                                                    <span ></span>
+                                                                    <span ></span>
+                                                                    <span></span>
+                                                                    <span></span>
+                                                                </div>`; // Show the loader
                 aiProfileButton?.setAttribute('disabled', 'true');
                 expandHorizonButton.setAttribute('disabled', 'true');
                 planReadingGoalButton?.setAttribute('disabled', 'true');
@@ -105,7 +125,7 @@ export default class AIPage extends HTMLElement {
                 } catch (error) {
                     console.error('Error calling Gemini API:', error);
                 } finally {
-                    loader.style.display = 'none'; // Hide the loader
+                    conversationContainer!.removeChild(conversationContainer!.querySelector(".loader")!);
                     aiProfileButton?.removeAttribute('disabled');
                     expandHorizonButton.removeAttribute('disabled');
                     planReadingGoalButton?.removeAttribute('disabled');
@@ -116,7 +136,14 @@ export default class AIPage extends HTMLElement {
 
             if (planReadingGoalButton && this.user) {
             planReadingGoalButton?.addEventListener('click', async () => {
-                loader.style.display = 'flex'; // Show the loader
+                conversationContainer!.innerHTML += `<div class="loader">
+                                                                    <span></span>
+                                                                    <span ></span>
+                                                                    <span ></span>
+                                                                    <span ></span>
+                                                                    <span></span>
+                                                                    <span></span>
+                                                                </div>`
                 aiProfileButton?.setAttribute('disabled', 'true');
                 expandHorizonButton?.setAttribute('disabled', 'true');
                 planReadingGoalButton.setAttribute('disabled', 'true');
@@ -131,7 +158,7 @@ export default class AIPage extends HTMLElement {
                 } catch (error) {
                     console.error('Error calling Gemini API:', error);
                 } finally {
-                    loader.style.display = 'none'; // Hide the loader
+                    conversationContainer!.removeChild(conversationContainer!.querySelector(".loader")!);
                     aiProfileButton?.removeAttribute('disabled');
                     expandHorizonButton?.removeAttribute('disabled');
                     planReadingGoalButton.removeAttribute('disabled');

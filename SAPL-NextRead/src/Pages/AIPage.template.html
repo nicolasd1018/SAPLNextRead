@@ -32,13 +32,15 @@
         width: 80vw !important;
     }
     .loader{
-        transform: translate(-50%, -50%);
-        display: none;
+        display: flex;             /* Toggle to 'flex' via JS when loading */
         align-items: center;
-        position: absolute;
-        bottom: 20px;              /* Forces it to the bottom */
-        left: 50%;                 /* Centers it horizontally */
-        transform: translateX(-50%);    
+        justify-content: center;   /* Centers content horizontally without left/transform */
+        position: sticky;          /* Sticks to the visible bottom edge while scrolling */
+        bottom: 20px;              /* 20px above the visible bottom edge */
+        top: 20px;
+        width: fit-content;        /* Shrinks box to loader size so margin auto works */
+        margin: 0 auto;            /* Centers horizontally cleanly inside sticky flow */
+        z-index: 10;               /* Ensures it floats above scrolling text */
     }
     /* Creating the dots */
     span{
@@ -85,14 +87,7 @@
 <div style="display: flex; flex-direction: row; margin-top: 20px; gap: 15px;">
     <div style="display: flex; flex-direction: column;">
         <div id="conversation-container">
-            <div class="loader">
-                <span></span>
-                <span ></span>
-                <span ></span>
-                <span ></span>
-                <span></span>
-                <span></span>
-            </div>    
+                
         </div>
         <input type="text" id="user-input" placeholder="Type your message here..." />
     </div>

@@ -12,6 +12,7 @@ import User from '../Types/User';
 import Searchbar from '../components/Searchbar.js';
 import Author from '../Types/Author';
 import { GoogleGenAI } from '@google/genai';
+import BookList from '../Types/bookList';
 
 
 
@@ -93,7 +94,6 @@ export class MainPage extends HTMLElement {
   render() {
     if (this.shadowRoot && this.user) {
         this.shadowRoot.innerHTML = templateString;
-        const searchBar = this.shadowRoot.querySelector("nextread-searchbar")?.shadowRoot?.getElementById("search-bar");
         const search = this.shadowRoot.querySelector("nextread-searchbar")
         const bookSpace = this.shadowRoot.getElementById("book-space");
         const rightArrow = this.shadowRoot.getElementById("right-arrow");
@@ -115,6 +115,9 @@ export class MainPage extends HTMLElement {
         let searchedBook: book;
         let authoredBooks: book[];
         let authorSearchList: book[] = [];
+        let bookList: BookList;
+        (search as Searchbar).user = this.user;
+        const searchBar = this.shadowRoot.querySelector("nextread-searchbar")?.shadowRoot?.getElementById("search-bar");
 
         if (searchBar && search && searchBar instanceof HTMLInputElement) {
             search?.addEventListener('change-search-criteria', async ()=>{
@@ -152,6 +155,42 @@ export class MainPage extends HTMLElement {
                     }
                     loadingScreen!.style.display = 'none';
             });
+            search.addEventListener("search-by-list", async (event) => {
+                loadingScreen!.style.display = 'flex';
+                bookList = (event as CustomEvent).detail.list;
+                this.#books = await getListBooks(bookList.books, [],this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, this.user!.bookRatingThreshold);
+                if (this.#books.length > 0) {
+                        this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
+                    
+                        // check to see if books are available in SAPL catalogue and filter out the ones that aren't
+                        this.#books = await this.availabilityCheck(this.#books);
+
+                        this.filterBooks();
+                        
+                        this.fillBookCarousel(this.#books, bookSpace!, x);
+                        if (bookSpace && bookSpace instanceof HTMLElement)
+                        {
+                            bookCovers = this.shadowRoot?.querySelectorAll(".book-cover")!
+                            if (bookCovers) {
+                                bookCovers.forEach((bc)=> {
+                                    const bookIndex = Number(bc.getAttribute('data-book-index'));
+                                    if (bookIndex >= 0){
+                                        bc.addEventListener("click", async (event) => {
+                                            changePage(undefined, this.#books[bookIndex])
+                                        })
+                                    }
+                                })
+                            }
+                        }
+                    }
+                    else if (errorModal && errorModal instanceof HTMLElement){
+                        errorModal.setAttribute('error-title', 'Search Input Error');
+                        errorModal.setAttribute('error-message', 'There has been an error finding books like the one  entered. The most likely explanation is that the title was input incorrectly. Please try again with the exact title, including exact capitalization, punctuation, and spacing.');
+                        (errorModal as ErrorModal).addInformation();
+                        errorModal.style.display = 'flex';
+                    }
+                    loadingScreen!.style.display = 'none';
+            })
             searchBar.addEventListener("keydown", async (event) => {
                 if (event.key === "Enter") {
                     event.preventDefault();
@@ -336,6 +375,9 @@ export class MainPage extends HTMLElement {
                     }
                     else if ((search as Searchbar).mode === 'publisher'){
                         newBooks = await getPublisherBooks((searchBar as HTMLInputElement).value, this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
+                    }
+                    else if ((search as Searchbar).mode === 'book-list') {
+                        newBooks = await getListBooks(bookList.books, [],this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
                     }
                     else {
                         newBooks = await getRecommendations(searchedBook.title,this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, this.user!.useState.whiteList.filter((tag)=> tag.type === 'publisher').map((tag) => tag.name),  this.user!.useState.blackList.filter((tag)=> tag.type === 'publisher').map((tag) => tag.name), iteration);

@@ -99,10 +99,11 @@ export class SettingsPage extends HTMLElement {
                 genderInput.value = this.user.gender ;
             }
             if (usernameInput && this.user) {
-                usernameInput.value = this.user.userName ;
+                usernameInput.value = this.user.userName;
             }
             if (passwordInput && this.user) {
-                passwordInput.value = await window.api.getPassword(this.user.id) ;
+                passwordInput.value = "";
+                passwordInput.placeholder = "Leave blank to keep password.";
             }
 
             if (saveSettingsButton) {
@@ -142,7 +143,7 @@ export class SettingsPage extends HTMLElement {
                             await window.api.updateUsername(this.user.id, usernameInput.value);
                             updatedUser.userName = usernameInput.value;
                         }
-                        if (passwordInput && passwordInput.value) {
+                        if (passwordInput && passwordInput.value && passwordInput.value !== "") {
                             // Assuming you have a method to update the password in your API
                             await window.api.updatePassword(this.user.id, passwordInput.value);
                         }
@@ -178,7 +179,6 @@ export class SettingsPage extends HTMLElement {
                     const newListId = (event as CustomEvent<{ id: number }>).detail.id;
                     const newOption = document.createElement('option');
                     newOption.value = newListId.toString();
-                    const newList = this
                     newOption.textContent = `List ${newListId}`;
                     listSelect?.appendChild(newOption);
                 });
