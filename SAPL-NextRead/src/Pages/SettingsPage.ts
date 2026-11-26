@@ -49,7 +49,6 @@ export class SettingsPage extends HTMLElement {
 
             if (allowListsCheckbox && this.user) {
                 allowListsCheckbox.checked = this.user.allowedToUseData;
-                console.log(allowListsCheckbox.checked);
                 allowListsCheckbox.addEventListener('change', async () => {
                     if (this.user) {
                         const updatedUser: User = {...this.user!, allowedToUseData: allowListsCheckbox.checked};

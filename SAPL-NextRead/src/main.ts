@@ -91,7 +91,6 @@ ipcMain.handle('get-users', async (event) => {
     try {
         const getUsers = db.prepare(`SELECT * FROM users`);
         const users = getUsers.all();
-        console.log(users);
          return users.map((preUser)=> {
           const getUseState = db.prepare(`SELECT * FROM useStates WHERE id = ?`);
           const useState = getUseState.get(preUser.useState_id);

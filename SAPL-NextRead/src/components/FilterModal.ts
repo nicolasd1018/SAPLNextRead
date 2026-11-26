@@ -70,7 +70,6 @@ export default class FilterModal extends HTMLElement{
 
             if (tagSpace) {
                 tagSpace.addEventListener('set-filter', (event)=>{
-                    console.log(event.detail);
                     this.user.useState ={whiteList: (event as CustomEvent).detail.whiteList, blackList:(event as CustomEvent).detail.blackList, ageRange: (event as CustomEvent).detail.ageRange, bipocFilter: (event as CustomEvent).detail.bipocFilter, lgbtqFilter: (event as CustomEvent).detail.lgbtqFilter};
                 });
                 (tagSpace as TagMenu).setWhiteList('genre', this.user.useState.whiteList.filter((tag)=> tag.type === 'genre').map((tag)=> tag.name));
@@ -84,7 +83,6 @@ export default class FilterModal extends HTMLElement{
                 (tagSpace as TagMenu).setBlackList('publisher', this.user.useState.whiteList.filter((tag)=> tag.type === 'publisher').map((tag)=> tag.name));
 
                 const ages = ['Toddler', 'Juvenile Beginner', 'Juvenile', 'Young Adult', 'Adult'];
-                console.log(ages.findIndex((age)=> age=== this.user.useState.ageRange[0]));
                 (tagSpace as TagMenu).initialMin = ages.findIndex((age)=> age=== this.user.useState.ageRange[0]);
                 (tagSpace as TagMenu).initialMax = ages.findIndex((age)=> age=== this.user.useState.ageRange.at(-1));
                 (tagSpace as TagMenu).is_bipoc = this.user.useState.bipocFilter;

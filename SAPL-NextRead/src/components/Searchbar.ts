@@ -103,7 +103,6 @@ class Searchbar extends HTMLElement {
             searchInput.addEventListener('input', () =>{
                 if (!searchInput.checkValidity())
                 {
-                    console.log(searchInput.pattern);
                     searchInput.value = searchInput.value.replace(/[^0-9 ]/g, ''); 
                 }
             });

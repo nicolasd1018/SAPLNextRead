@@ -22,7 +22,6 @@ export default class AuthorPage extends HTMLElement {
     }
 
     render() {
-        console.log(this.author);
         if (this.shadowRoot && this.author){
             this.shadowRoot.innerHTML = templateString;
             const authorImg = this.shadowRoot.getElementById('author-img') as HTMLImageElement | undefined;
@@ -37,7 +36,6 @@ export default class AuthorPage extends HTMLElement {
 
 
             if (authorImg) {
-                console.log(this.author.image);
                 authorImg.src = this.author.image === null ? '' :this.author.image.url;
             }
 

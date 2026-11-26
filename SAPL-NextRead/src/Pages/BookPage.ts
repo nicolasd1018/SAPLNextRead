@@ -176,7 +176,6 @@ class BookPage extends HTMLElement {
                         this.user!.searchLists.find((list)=> list.id === id)!.books=[...this.user!.searchLists.find((list)=> list.id === id)!.books, title!];
 
                         const option = this.shadowRoot?.getElementById(`remove-from-list-${id}`)!;
-                        console.log(option);
                         removeFromList.removeChild(option);
                         option.id = option.id.replace('remove-from-list', 'add-to-list');
                         addToList.appendChild(option);

@@ -44,9 +44,7 @@ import { SettingsPage } from './Pages/SettingsPage';
 import AIPage from './Pages/AIPage';
 import './Pages/AIPage';
 
-console.log(
-  '👋 This message is being logged by "renderer.ts", included via Vite',
-);
+
 
 const mainPage = document.createElement('main-page');
 const bookPage = document.createElement('book-page');
@@ -59,7 +57,6 @@ const aiPage = document.createElement('ai-page');
 
 export const changePage = (user?: User, book?: Book, author?: Author, logout: boolean = false, settings: boolean = false, ai: boolean = false) => {
   if (book) {
-    console.log('test');
     mainPage.style.display = 'none';
     bookPage.setAttribute('imgUrl', book.image.url);
     bookPage.setAttribute('bookTitle', book.title);

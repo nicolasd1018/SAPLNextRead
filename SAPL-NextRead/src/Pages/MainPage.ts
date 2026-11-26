@@ -82,7 +82,7 @@ export class MainPage extends HTMLElement {
                 this.#books = this.#books.filter((book)=>book.contentWarnings.some((contentWarning)=> {return this.user!.useState.whiteList.map((tag)=> tag.name).includes(contentWarning.tag.tag);}));
 
             if (this.user.useState.blackList.filter((tag) => tag.type === 'genre').length !== 0) 
-                this.#books = this.#books.filter((book)=>book.genres.every((genre)=> {console.log(this.user!.useState.blackList.map((tag)=> tag.name), genre.tag.tag, this.user!.useState.blackList.map((tag)=> tag.name).includes(genre.tag.tag));return !this.user!.useState.blackList.map((tag)=> tag.name).includes(genre.tag.tag);}));
+                this.#books = this.#books.filter((book)=>book.genres.every((genre)=> {return !this.user!.useState.blackList.map((tag)=> tag.name).includes(genre.tag.tag);}));
             if (this.user.useState.blackList.filter((tag) => tag.type === 'mood').length !== 0)  
                 this.#books = this.#books.filter((book)=>book.moods.every((mood)=> {return !this.user!.useState.blackList.map((tag)=> tag.name).includes(mood.tag.tag);}));
             if (this.user.useState.blackList.filter((tag) => tag.type === 'content-warning').length !== 0) 
@@ -237,7 +237,6 @@ export class MainPage extends HTMLElement {
 
                         if (bookTitle && searchedCover && bookslike && bookslikeHelperText) {
                             if ((search as Searchbar).mode === 'title' && searchedBook) { 
-                                console.log('test');
                                 bookslikeHelperText.innerText = "Books like";
                                 bookslike.style.display = 'flex';
                                 bookTitle.textContent = searchedBook.title;
@@ -268,7 +267,6 @@ export class MainPage extends HTMLElement {
                                 authorSubmitBtn!.style.display = 'flex';
                                 authorSubmitBtn?.addEventListener('click', async ()=>{
                                     loadingScreen!.style.display = 'flex';
-                                    console.log(authorSearchList);
                                     this.#books = await getListBooks(authorSearchList.map((book) => book.title),[],this.user!.useState.bipocFilter, this.user!.useState.lgbtqFilter, iteration);
                                     if (this.#books.length > 0) {
                                     this.#books = [...new Set(this.#books.map(p => JSON.stringify(p)))].map(p => JSON.parse(p));
@@ -439,7 +437,6 @@ export class MainPage extends HTMLElement {
                 }
             });
             (filterModal as FilterModal).setUser(this._user!);
-            console.log('1.5', (filterModal as FilterModal).user);
         }
     }
   }

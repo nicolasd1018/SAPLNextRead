@@ -142,7 +142,6 @@ class TagMenu extends HTMLElement {
                         else {
                             this.whiteListTags.set(this.tagType, [...this.whiteListTags.get(this.tagType)!, tag]);
                         }
-                        console.log(this.whiteListTags);
                         this.dispatchEvent(new CustomEvent('set-filter', {detail:{whiteList: Array.from(this.whiteListTags).flatMap(([key, values]) => values.map((value) => ({ name: value, type: key } as Tag))), blackList:Array.from(this.blackListTags).flatMap(([key, values]) => values.map((value) => ({ name: value, type: key } as Tag))), ageRange: this.ages.slice(this.ageRangeMin, this.ageRangeMax), bipocFilter: this.bipocFilter, lgbtqFilter: this.lgbtqFilter}}));
                     });
                     
@@ -232,7 +231,6 @@ class TagMenu extends HTMLElement {
                         if (Math.abs(distanceToBottom) <= 1) {
                             var newTags: string[] = [];
                             this.tagIndexes.set(this.tagType, this.tagIndexes.get(this.tagType)!+1);
-                            console.log(this.tagIndexes.get(this.tagType));
                             newTags = await this.getTags(this.tagIndexes.get(this.tagType));
                             this.tags.set(this.tagType, [...this.tags.get(this.tagType)!,...newTags]);
                             this.createTags(this.tags.get(this.tagType)!.filter((tag) => tag.includes((searchBar as HTMLInputElement)!.value)));

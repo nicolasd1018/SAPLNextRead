@@ -38,14 +38,12 @@ export const getListBooks = async (bookList: string[], bannedBooks: string[], bi
     var reccomendation: book[] =  [];
     let list = '';
     let bannedList = ''
-    console.log(bookList);
     bookList.forEach((book) => { 
                                     list += `{title: {_eq: "${book}"}},`;
                                     bannedList += `{book: {title: {_neq: "${book}"}}},`;
                                 });
     
     bannedBooks.forEach((book)=> bannedList += `{book: {title: {_neq: "${book}"}}},`);
-    console.log(list, bannedList)
     await client
     .query({
         query: gql`
@@ -124,7 +122,6 @@ export const getListBooks = async (bookList: string[], bannedBooks: string[], bi
     `,
         errorPolicy: 'all'
     }).then((result) => { 
-        console.log(result);
         if ((result.data as response).books.length ===0 ) {
             reccomendation = []
         }
@@ -210,7 +207,6 @@ export const getPublisherBooks = async (publisher: string, bipocFilter: boolean,
     `,
         errorPolicy: 'all'
     }).then((result) => { 
-        console.log(result);
         if ((result.data).books.length ===0 ) {
             reccomendation = []
         }
@@ -224,7 +220,6 @@ export const getPublisherBooks = async (publisher: string, bipocFilter: boolean,
 export const getAuthorBooks = async (author: string, bookRatingThreshold: number    ) => {
     let reccomendation: book[] = [];
     const authorProfile = await getAuthor(author);
-    console.log(authorProfile?.name ?? '');
     await client
     .query({
         query: gql`
@@ -295,7 +290,6 @@ export const getAuthorBooks = async (author: string, bookRatingThreshold: number
     `,
         errorPolicy: 'all'
     }).then((result) => { 
-        console.log(result);
         if ((result.data).books.length ===0 ) {
             reccomendation = []
         }
@@ -376,7 +370,6 @@ export const getAuthor = async (author: string, exactSearch: boolean = false): P
 
 export const getRecommendations = async (title: string, bipocFilter: boolean, lgbtqFilter:boolean, publisherWhiteList: string[], publisherBlackList: string[], bookRatingThreshold: number, iteration?: number): Promise<book[]>=> {
     var reccomendation: book[] =  [];
-    console.log(publisherWhiteList);
     let allowedPublishers = `{_or: [`;
     publisherWhiteList.forEach((pub) => {
         allowedPublishers += `{editions: {publisher: {name: {_eq: "${pub}"}}}},`
@@ -388,7 +381,6 @@ export const getRecommendations = async (title: string, bipocFilter: boolean, lg
         bannedPublishers += `{editions: {publisher: {name: {_neq: "${pub}"}}}},`
     });
     bannedPublishers += `]}`
-    console.log(allowedPublishers);
     await client
     .query({
         query: gql`
